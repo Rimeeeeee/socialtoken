@@ -17,6 +17,35 @@
 
 @layer base {
   body {
-    @apply bg-zinc-950 text-neutral-200;
+    @apply bg-black text-neutral-200;
   }
+}
+.glassmorphism {
+  position: relative;
+  width: 33%;
+  padding: 2rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.3); /* Semi-transparent white */
+  backdrop-filter: blur(10px); /* Blur effect */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Light border for definition */
+  z-index: 10;
+}
+/* Hide scrollbars for WebKit browsers */
+.no-scrollbar::-webkit-scrollbar {
+  width: 0; /* Hide the scrollbar */
+  height: 0; /* Hide the scrollbar for horizontal scrolling */
+}
+
+.no-scrollbar {
+  overflow: -moz-scrollbars-none; /* Hide scrollbar for Firefox */
+  /* overflow: hidden; Hide scrollbar for other browsers */
+}
+
+/* Optional: Show scrollbar on hover if needed */
+.no-scrollbar:hover::-webkit-scrollbar {
+  width: 8px;
+}
+
+.no-scrollbar:hover {
+  overflow: auto;
 }
