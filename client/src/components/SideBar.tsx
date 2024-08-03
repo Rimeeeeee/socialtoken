@@ -8,6 +8,7 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa"
+import { MdAddAPhoto } from "react-icons/md"
 import { NavLink } from "react-router-dom"
 
 const user = {
@@ -27,7 +28,7 @@ const SideBar = () => {
     <div
       className={`fixed h-screen ${isOpen ? "sm:w-64 w-52" : "w-0"} bg-zinc-950 text-white gap-4 flex flex-col transition-all duration-300 z-50`}
     >
-      <div className="flex flex-col flex-grow">
+      <div className="flex flex-col mr-12">
         {/* Header with profile */}
         <div
           className={`p-2 text-2xl font-semibold flex flex-col items-center ${!isOpen && "hidden"}`}
@@ -41,6 +42,7 @@ const SideBar = () => {
               alt="Profile"
               className="w-10 h-10 rounded-full"
             />
+
             <div>
               <div className="text-lg text-wrap">{user.username}</div>
               <div className="text-sm text-gray-700">@{user.userId}</div>
@@ -48,7 +50,7 @@ const SideBar = () => {
           </NavLink>
           <button
             onClick={toggleSidebar}
-            className="text-lg mt-9 ml-1 absolute top-4 right-4 "
+            className="text-4xl mt-8 ml-1 absolute top-4 right-4 "
           >
             <FaTimes />
           </button>
@@ -61,12 +63,12 @@ const SideBar = () => {
             to="/"
             className={({ isActive }) =>
               isActive
-                ? "flex items-center space-x-2 p-2 bg-blue-500 rounded-md"
+                ? "flex group items-center space-x-2 p-2 bg-blue-500 rounded-md"
                 : "flex items-center space-x-2 p-2 hover:bg-blue-500 rounded-md"
             }
           >
-            <FaHome className="text-xl" />
-            <span>Home</span>
+            <FaHome className="text-xl group-hover:text-white" />
+            <span className="group-hover:text-white">Home</span>
           </NavLink>
           <NavLink
             to="/explore"
@@ -109,7 +111,7 @@ const SideBar = () => {
                 : "flex items-center space-x-2 p-2 hover:bg-blue-500 rounded-md"
             }
           >
-            <FaClipboardList className="text-xl" />
+            <MdAddAPhoto className="text-xl mb-1" />
             <span>Create Post</span>
           </NavLink>
         </div>

@@ -1,6 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* src/styles.css */
 
 :root {
   line-height: 1.5;
@@ -13,6 +16,26 @@
   font-optical-sizing: auto;
   font-style: normal;
   font-variation-settings: "slnt" 0;
+}
+.cedarville-cursive-regular {
+  font-family: "Cedarville Cursive", cursive;
+  font-weight: 400;
+  font-style: cursive;
+}
+.dancing-script-500 {
+  font-family: "Dancing Script", cursive;
+  font-weight: 500;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #6ee7b7, #3b82f6, #9333ea);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; /* Standard syntax */
+  color: transparent; /* Fallback for older browsers */
+}
+.text-primary {
+  font-family: "Poppins", sans-serif;
 }
 
 @layer base {
@@ -43,9 +66,34 @@
 
 /* Optional: Show scrollbar on hover if needed */
 .no-scrollbar:hover::-webkit-scrollbar {
-  width: 8px;
+  width: 0px;
 }
 
 .no-scrollbar:hover {
   overflow: auto;
+}
+body::-webkit-scrollbar {
+  width: 0px;
+}
+.button-p {
+  display: inline-block;
+  border: 2px solid white;
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 5px;
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+  transition:
+    color 0.3s,
+    background-color 0.3s;
+}
+
+.button-p:hover {
+  background: linear-gradient(135deg, #6ee7b7, #3b82f6, #9333ea);
+
+  color: white; /* fallback for older browsers */
 }
