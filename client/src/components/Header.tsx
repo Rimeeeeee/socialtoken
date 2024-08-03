@@ -27,10 +27,16 @@ const TopBar = () => {
             className="w-10 h-10 rounded-full"
           />
           <div>
-            <div className="text-lg font-semibold">{user.username}</div>
+            <div className="text-md font-semibold">{user.username}</div>
             <div className="text-sm text-gray-400">@{user.userId}</div>
           </div>
         </NavLink>
+      </div>
+      <div>
+        {" "}
+        <span className="dancing-script-500 text-gradient font-bold text-xl sm:text-4xl">
+          Enigma
+        </span>
       </div>
       {/* Connect button */}
       <button className="bg-blue-600 text-white py-2 px-4 rounded-md flex items-center space-x-2 hover:bg-blue-700">
