@@ -34,3 +34,4 @@ const VantaEffect: React.FC = () => {
 }
 
 export default VantaEffect
+//update it to be used as background
