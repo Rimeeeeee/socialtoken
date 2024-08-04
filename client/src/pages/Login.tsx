@@ -7,7 +7,7 @@ import { Navigate } from "react-router-dom"
 const Login: React.FC = () => {
   const [registered, setRegistered] = useState(false)
 
-  if (!registered) {
+  if (registered) {
     return <Navigate to="/" />
   }
   return (
