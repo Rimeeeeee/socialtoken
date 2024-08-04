@@ -88,7 +88,10 @@ const CreatePost: React.FC = () => {
   return (
     <div className="relative">
       <Vanta />
-      <div className="relative z-10 max-w-md mx-auto p-6 bg-black bg-opacity-50 border-2 border-white rounded-lg">
+      <div
+        className="relative z-10 max-w-md mx-auto p-6 bg-black
+       bg-opacity-30 border-2 border-white rounded-lg"
+      >
         <div className="mt-20">
           <h1 className="my-12 text-3xl font-extrabold text-white flex flex-row gap-2">
             <MdLibraryAdd className="mt-1 font-3xl" />

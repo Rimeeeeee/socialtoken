@@ -46,7 +46,7 @@ const App: React.FC = () => {
             path="/"
             element={
               <Layout>
-                <Home />
+                <Home />{" "}
               </Layout>
             }
           />
