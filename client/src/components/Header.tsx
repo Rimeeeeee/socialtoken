@@ -16,7 +16,7 @@ const TopBar = () => {
      justify-between px-4 shadow-white fixed top-0 z-40"
     >
       {/* Profile section */}
-      <div className="ml-12">
+      <div className="ml-12 hidden sm:block">
         <NavLink
           to={`/profile/${user.userId}`}
           className="flex items-center space-x-2"
@@ -34,7 +34,7 @@ const TopBar = () => {
       </div>
       <div>
         {" "}
-        <span className="dancing-script-500 text-gradient font-bold text-xl sm:text-4xl">
+        <span className="dancing-script-500 text-gradient font-bold text-xl sm:text-4xl ml-14 sm:ml-0">
           Enigma
         </span>
       </div>

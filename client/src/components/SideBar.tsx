@@ -50,7 +50,7 @@ const SideBar = () => {
           </NavLink>
           <button
             onClick={toggleSidebar}
-            className="text-4xl mt-8 ml-1 absolute top-4 right-4 "
+            className="text-4xl mt-7 ml-1 absolute top-4 right-4 "
           >
             <FaTimes />
           </button>
@@ -119,7 +119,7 @@ const SideBar = () => {
       {!isOpen && (
         <button
           onClick={toggleSidebar}
-          className="text-2xl p-2 bg-black text-white fixed top-4 left-4 z-50"
+          className="text-2xl p-2 bg-black text-white fixed top-4 left-4 z-50 mb-2"
         >
           <FaBars />
         </button>
