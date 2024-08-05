@@ -7,6 +7,10 @@ interface MockPostData {
   caption: string
 }
 
+interface NumberProps {
+  pid: number
+}
+
 interface Comment {
   username: string
   profilePic: string
@@ -18,7 +22,7 @@ const mockPostData: MockPostData = {
   caption: "Look what Vanta Js is capable of...its just amazing",
 }
 
-const Post: React.FC = () => {
+const Post: React.FC<NumberProps> = ({ pid }) => {
   const [likes, setLikes] = useState<number>(0)
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState<string>("")
@@ -61,7 +65,7 @@ const Post: React.FC = () => {
           //src={`https://ipfs.io/ipfs/${mockPostData.fileHash}`}
           alt="Post content"
         /> */}
-        <Vanta />
+        {/* <Vanta /> */}
         <h2 className="text-xl font-semibold mt-2 text-wrap">
           {mockPostData.caption}
         </h2>
