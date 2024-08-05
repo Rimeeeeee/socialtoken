@@ -2,11 +2,12 @@
 error AlreadyAnUser();
 error InvalidAccess();
 pragma solidity ^0.8.17;
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-contract OceanToken is ERC20,ERC20Burnable{
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+contract ICSToken is ERC20,ERC20Burnable{
     address payable owner;
-    constructor(uint256 initialSupply)ERC20("OceanToken","OCT"){
+    constructor(uint256 initialSupply)ERC20("ICSToken","ICS"){
         owner=payable(msg.sender);
         _mint(msg.sender,initialSupply*(10**decimals()));
     }
@@ -23,13 +24,13 @@ contract OceanToken is ERC20,ERC20Burnable{
 } 
 contract Social{
     address  immutable  owner;
-    OceanToken public oceantoken;
+    ICSToken public icstoken;
     constructor(address ot){
-       oceantoken=OceanToken(ot);
+       icstoken=ICSToken(ot);
        owner=(msg.sender);
-       oceantoken.mint(address(this),300000);
-       oceantoken.approve(address(this),300000);
-       oceantoken.allowance(msg.sender,address(this));
+       icstoken.mint(address(this),300000);
+       icstoken.approve(address(this),300000);
+       icstoken.allowance(msg.sender,address(this));
     }
     struct Post{
         uint256 pid;
@@ -40,6 +41,7 @@ contract Social{
         string videos;
         uint256 likes;
         uint256 shares;
+        string tags;
         
     }
     struct User{
@@ -91,7 +93,7 @@ contract Social{
    
   //on creation of post 2 tokens will be given,if greater then no token
     function createPost(string memory _title,string memory _description,string
-    memory _imageHash,string memory _videoHash )external{
+    memory _imageHash,string memory _videoHash,string memory _tags )external{
         require(isAUser[msg.sender]==true,"only users can post");
         pidCount++;
          Post storage post=posts[pidCount];
@@ -101,22 +103,23 @@ contract Social{
          post.title=_title;
          post.description=_description;
          post.videos=_videoHash;
+         post.tags=_tags;
          userCheck[msg.sender].content.push(post);
          postArray.push(post);
-         oceantoken.transferFrom(address(this),msg.sender,2);
-         userCheck[msg.sender].token=oceantoken.balanceOf(msg.sender);
+         icstoken.transferFrom(address(this),msg.sender,2);
+         userCheck[msg.sender].token=icstoken.balanceOf(msg.sender);
         
         
-          //make changes here so that allowance and stuff are stored in array operated in oceantoken directly
+          
     }
      function getBalance(address a) public view returns (uint256) {
-        return oceantoken.balanceOf(a);
+        return icstoken.balanceOf(a);
     }
    
   function sendInitial()internal{
         registerCount++;
-                oceantoken.transferFrom(address(this),msg.sender,5);
-                userCheck[msg.sender].token=oceantoken.balanceOf(msg.sender);
+                icstoken.transferFrom(address(this),msg.sender,5);
+                userCheck[msg.sender].token=icstoken.balanceOf(msg.sender);
                 gotInitial[msg.sender]=true; 
        
     }
@@ -147,18 +150,20 @@ contract Social{
             if(userCheck[msg.sender].dailylikestamp.length==20){
                 uint256 diff=userCheck[msg.sender].dailylikestamp[19]-userCheck[msg.sender].dailylikestamp[0];
                 if(diff<=24 hours){
-                    oceantoken.transferFrom(address(this),msg.sender,2);
-                    userCheck[msg.sender].token=oceantoken.balanceOf(msg.sender);
-                    userCheck[msg.sender].dailylikes=0;
+                     userCheck[msg.sender].dailylikes=0;
+                    icstoken.transferFrom(address(this),msg.sender,2);
+                    userCheck[msg.sender].token=icstoken.balanceOf(msg.sender);
+                   
                 }
             }
             else if(userCheck[msg.sender].dailylikestamp.length>=20){
                 uint256 diff=userCheck[msg.sender].dailylikestamp[userCheck[msg.sender].dailylikestamp.length-1]-userCheck[msg.sender].dailylikestamp[userCheck[msg.sender].dailylikestamp.length-20];
                 uint256 diff1=userCheck[msg.sender].dailylikestamp[userCheck[msg.sender].dailylikestamp.length-20]-userCheck[msg.sender].dailylikestamp[userCheck[msg.sender].dailylikestamp.length-21];
                 if(diff<=24 hours && diff1>24 hours){
-                    oceantoken.transferFrom(address(this),msg.sender,2);
-                    userCheck[msg.sender].token=oceantoken.balanceOf(msg.sender);
-                    userCheck[msg.sender].dailylikes=0;
+                     userCheck[msg.sender].dailylikes=0;
+                    icstoken.transferFrom(address(this),msg.sender,2);
+                    userCheck[msg.sender].token=icstoken.balanceOf(msg.sender);
+                   
                 }
             }
 
@@ -195,8 +200,8 @@ contract Social{
                 uint256 diff=userCheck[msg.sender].dailysharestamp[9]-userCheck[msg.sender].dailysharestamp[0];
                 if(diff<=24 hours){
                      userCheck[msg.sender].dailyshares=0;
-                    oceantoken.transferFrom(address(this),msg.sender,1);
-                    userCheck[msg.sender].token=oceantoken.balanceOf(msg.sender);
+                    icstoken.transferFrom(address(this),msg.sender,1);
+                    userCheck[msg.sender].token=icstoken.balanceOf(msg.sender);
                    
                 }
             }
@@ -205,8 +210,8 @@ contract Social{
                 uint256 diff1=userCheck[msg.sender].dailysharestamp[userCheck[msg.sender].dailysharestamp.length-10]-userCheck[msg.sender].dailysharestamp[userCheck[msg.sender].dailysharestamp.length-11];
                 if(diff<=24 hours && diff1>24 hours){
                     userCheck[msg.sender].dailyshares=0;
-                    oceantoken.transferFrom(address(this),msg.sender,2);
-                    userCheck[msg.sender].token=oceantoken.balanceOf(msg.sender);
+                    icstoken.transferFrom(address(this),msg.sender,2);
+                    userCheck[msg.sender].token=icstoken.balanceOf(msg.sender);
                     
                 }
             }
@@ -225,10 +230,10 @@ contract Social{
     require(_p<=pidCount,"Invalid pid");
     require(isAUser[msg.sender]==true,"should be user");
     Post storage post=posts[_p];
-    require(_amount<=oceantoken.balanceOf(msg.sender),"not possible");
-    oceantoken.transferFrom(msg.sender,post.creator,_amount);
-    userCheck[msg.sender].token=oceantoken.balanceOf(msg.sender);
-    userCheck[post.creator].token=oceantoken.balanceOf(post.creator);
+    require(_amount<=icstoken.balanceOf(msg.sender),"not possible");
+    icstoken.transferFrom(msg.sender,post.creator,_amount);
+    userCheck[msg.sender].token=icstoken.balanceOf(msg.sender);
+    userCheck[post.creator].token=icstoken.balanceOf(post.creator);
 
 
    }
@@ -282,9 +287,13 @@ contract Social{
         
         if(x==true){
             user.following.pop();
-            User storage user1=userCheck[_follower];
+           unfollowHandle(_follower,msg.sender);
+    }
+   }
+   function unfollowHandle(address _follower,address x)internal{
+     User storage user1=userCheck[_follower];
         for(uint i=0;i<user1.followers.length;i++){
-        if(user1.followers[i]==msg.sender){
+        if(user1.followers[i]==x){
                address t=user1.followers[i];
                user1.followers[i]=user1.followers[user1.followers.length-1];
                user1.followers[user1.followers.length-1]=t;
@@ -293,7 +302,7 @@ contract Social{
         }
         user1.followers.pop();
         }
-    }
+
    }
    //get all users
    function getUserById(address _user)external view returns(User memory){
@@ -307,5 +316,3 @@ contract Social{
    }
 }
 
-//person liking his/her post
-//note-make unfollow part internal too,parity betwn lika and share
