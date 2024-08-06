@@ -7,37 +7,36 @@ import {
 } from "thirdweb";
 import { createWallet } from "thirdweb/wallets";
 const wallets = [createWallet("io.metamask")];
-interface MarketplaceContextProps {
- 
+interface SocialContextProps {
+
   contract: any;
   wallets: any;
   client: any;
 }
 
-const MarketplaceContext = createContext<MarketplaceContextProps | undefined>(undefined);
+const SocialContext = createContext<SocialContextProps | undefined>(undefined);
 
 const client: ThirdwebClient = createThirdwebClient({
-  clientId:"89a5e5b847b9dbdf1aa28f3b1363cc9e",
-  //import.meta.env.VITE_CONTRACT_ADDRESS
+  clientId:import.meta.env.VITE_CONTRACT_ADDRESS as string,
 });
 
-interface MarketplaceContextProviderProps {
+interface SocialContextProviderProps {
   children: ReactNode;
 }
 
-export const MarketplaceContextProvider = ({
+export const SocialContextProvider = ({
   children,
-}: MarketplaceContextProviderProps) => {
+}: SocialContextProviderProps) => {
   const contract = getContract({
     client,
     chain: defineChain(2442),
-    address:"0xbA9489Fb374fC8E241b376fb04c287c29Fa7100d",
+    address:import.meta.env.VITE_CONTRACT_ADDRESS as string,
   });
 
   
 
   return (
-    <MarketplaceContext.Provider
+    <SocialContext.Provider
       value={{
       
         contract,
@@ -46,15 +45,15 @@ export const MarketplaceContextProvider = ({
       }}
     >
       {children}
-    </MarketplaceContext.Provider>
+    </SocialContext.Provider>
   );
 };
 
-export const useMarketplaceContext = () => {
-  const context = useContext(MarketplaceContext);
+export const useSocialContext = () => {
+  const context = useContext(SocialContext);
   if (context === undefined) {
     throw new Error(
-      "useStateContext must be used within a MarketplaceContextProvider",
+      "useStateContext must be used within a SocialContextProvider",
     );
   }
   return context;

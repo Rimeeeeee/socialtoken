@@ -17,8 +17,8 @@ interface IcsTokenContextProps {
 const IcsTokenContext = createContext<IcsTokenContextProps | undefined>(undefined);
 
 const client: ThirdwebClient = createThirdwebClient({
-  clientId:"89a5e5b847b9dbdf1aa28f3b1363cc9e",
-  //import.meta.env.VITE_CONTRACT_ADDRESS
+  clientId:import.meta.env.VITE_CONTRACT_ADDRESS as string,
+  
 });
 
 interface IcsTokenContextProviderProps {
@@ -31,7 +31,7 @@ export const IcsTokenContextProvider = ({
   const contract = getContract({
     client,
     chain: defineChain(2442),
-    address:"0xbA9489Fb374fC8E241b376fb04c287c29Fa7100d",
+    address:import.meta.env.VITE_CONTRACT_ADDRESS as string,
   });
 
   
