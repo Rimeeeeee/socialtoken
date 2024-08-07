@@ -53,6 +53,8 @@ contract Social{
         string caption;
         uint256 dailylikes;
         uint256 dailyshares;
+        uint256 dailycheckin;
+        uint256 [] dailycheckins;
         uint256 [] dailylikestamp;
          uint256 [] dailysharestamp;
         uint256 [] pid;
@@ -313,6 +315,25 @@ contract Social{
    //get user by id
    function getAllUsers()external view returns(User[]memory){
     return userArray;
+   }
+   function dailyCheckinHandler()external{
+    require(isAUser[msg.sender]==true,"should be user");
+    User storage user=userCheck[msg.sender];
+    if(user.dailycheckins.length==0){
+        user.dailycheckin=1;
+        user.dailycheckins.push(block.timestamp);
+        icstoken.transferFrom(address(this),msg.sender,5);
+         userCheck[msg.sender].token=icstoken.balanceOf(msg.sender);
+
+    }
+    else if(user.dailycheckins.length>0){
+        if((block.timestamp-user.dailycheckin[user.dailycheckins.length-1])>=24 hours){
+                  user.dailycheckin+=1;
+        user.dailycheckins.push(block.timestamp);
+        icstoken.transferFrom(address(this),msg.sender,5);
+         userCheck[msg.sender].token=icstoken.balanceOf(msg.sender); 
+        }
+    }
    }
 }
 
