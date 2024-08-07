@@ -1,7 +1,7 @@
 //SPDX-License-Identifier:MIT
 error AlreadyAnUser();
 error InvalidAccess();
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
@@ -327,7 +327,7 @@ contract Social{
 
     }
     else if(user.dailycheckins.length>0){
-        if((block.timestamp-user.dailycheckin[user.dailycheckins.length-1])>=24 hours){
+        if((block.timestamp-user.dailycheckins[user.dailycheckins.length-1])>=24 hours){
                   user.dailycheckin+=1;
         user.dailycheckins.push(block.timestamp);
         icstoken.transferFrom(address(this),msg.sender,5);

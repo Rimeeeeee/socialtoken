@@ -32,7 +32,7 @@ export const SocialTokenContextProvider = ({
 }: socialTokenContextProviderProps) => {
   const contract1 = getContract({
     client,
-    chain: defineChain(11155111),
+    chain: defineChain(3441006),
     address: import.meta.env.VITE_CONTRACT_ADDRESS_1 as string,
   });
 
