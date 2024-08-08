@@ -52,15 +52,16 @@ const CreatePost: React.FC = () => {
           client,
           files: [file],
         })
+        console.log(uris)
 
-        const fileHash = uris[0] // Assuming single file upload
+        const fileHash = uris // Assuming single file upload
 
         // Assuming image and video are mutually exclusive
-        const isImage = file.type.startsWith("image/")
-        const isVideo = file.type.startsWith("video/")
+        //const isImage = file.type.startsWith("image/")
+        // const isVideo = file.type.startsWith("video/")
 
-        const imageHash = isImage ? fileHash : ""
-        const videoHash = isVideo ? fileHash : ""
+        const imageHash = fileHash
+        const videoHash = fileHash
 
         // Prepare and send the transaction to the smart contract
         const transaction = prepareContractCall({

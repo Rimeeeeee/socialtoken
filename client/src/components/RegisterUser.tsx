@@ -97,7 +97,7 @@ const RegisterUser: React.FC = () => {
         })
         setFormState((prevState) => ({
           ...prevState,
-          profilePic: uris[0], // Set the first URI
+          profilePic: uris, // Set the first URI
         }))
       } catch (error) {
         console.error("Error uploading file to IPFS:", error)
