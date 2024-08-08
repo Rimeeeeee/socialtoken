@@ -5,7 +5,7 @@ import Balance from "../components/Balance"
 const Explore = () => {
   return (
     <div className="h-screen flex items-center justify-center">
-      <Balance />
+      <Post pid={3} />
     </div>
   )
 }
