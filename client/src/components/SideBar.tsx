@@ -8,6 +8,7 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa"
+import { FaCalendarCheck } from "react-icons/fa"
 import { MdAddAPhoto } from "react-icons/md"
 import { NavLink } from "react-router-dom"
 
@@ -69,6 +70,17 @@ const SideBar = () => {
           >
             <FaHome className="text-xl group-hover:text-white" />
             <span className="group-hover:text-white">Home</span>
+          </NavLink>
+          <NavLink
+            to="/dailylogin"
+            className={({ isActive }) =>
+              isActive
+                ? "flex group items-center space-x-2 p-2 bg-blue-500 rounded-md"
+                : "flex items-center space-x-2 p-2 hover:bg-blue-500 rounded-md"
+            }
+          >
+            <FaCalendarCheck className="text-xl group-hover:text-white" />
+            <span className="group-hover:text-white">Daily Check-in</span>
           </NavLink>
           <NavLink
             to="/explore"

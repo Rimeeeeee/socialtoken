@@ -13,6 +13,7 @@ import {
   Shop,
   CreatePost,
   CurrentUser,
+  DailyLogin,
 } from "./pages/index"
 import SideBar from "./components/SideBar"
 import Header from "./components/Header"
@@ -64,6 +65,14 @@ const App: React.FC = () => {
             element={
               <Layout>
                 <Profile />
+              </Layout>
+            }
+          />
+          <Route
+            path="/dailylogin"
+            element={
+              <Layout>
+                <DailyLogin />
               </Layout>
             }
           />
