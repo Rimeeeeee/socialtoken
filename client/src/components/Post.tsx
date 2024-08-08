@@ -9,6 +9,7 @@ interface MockPostData {
 
 interface NumberProps {
   pid: number
+  filehash: string
 }
 
 interface Comment {

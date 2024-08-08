@@ -1,38 +1,20 @@
 import React, { useState, useRef, ChangeEvent, FormEvent } from "react"
-import { useDrop, DropTargetMonitor } from "react-dnd"
 import { FaCloudUploadAlt } from "react-icons/fa"
 import { IoCloudUploadOutline } from "react-icons/io5"
 import { MdLibraryAdd } from "react-icons/md"
 import Vanta from "../components/Vanta1"
-
-interface FileItem {
-  files: File[]
-}
+import { prepareContractCall, sendTransaction } from "thirdweb"
+import { useSocialTokenContext } from "../context/context"
+import { upload } from "thirdweb/storage"
 
 const CreatePost: React.FC = () => {
   const [file, setFile] = useState<File | null>(null)
   const [caption, setCaption] = useState<string>("")
   const [tags, setTags] = useState<string>("")
   const [location, setLocation] = useState<string>("")
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-
-  const [{ isOver }, drop] = useDrop(
-    () => ({
-      accept: "FILE",
-      drop: (item: FileItem) => handleDrop(item),
-      collect: (monitor: DropTargetMonitor) => ({
-        isOver: !!monitor.isOver(),
-      }),
-    }),
-    [file],
-  )
-
-  const handleDrop = (item: FileItem) => {
-    // Handle only one file upload
-    if (item.files.length > 0) {
-      setFile(item.files[0])
-    }
-  }
+  const { SocialContract, account, client } = useSocialTokenContext()
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -46,10 +28,61 @@ const CreatePost: React.FC = () => {
     }
   }
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Handle form submission
-    console.log({ file, caption, tags, location })
+
+    // Validate inputs
+    const newErrors: { [key: string]: string } = {}
+    if (!file) newErrors.file = "Please upload a file."
+    if (!caption) newErrors.caption = "Caption is required."
+    if (!tags) newErrors.tags = "Tags are required."
+    if (!location) newErrors.location = "Location is required."
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    try {
+      // Clear previous errors
+      setErrors({})
+      if (file) {
+        // Upload the file and get the hash
+        const uris = await upload({
+          client,
+          files: [file],
+        })
+
+        const fileHash = uris[0] // Assuming single file upload
+
+        // Assuming image and video are mutually exclusive
+        const isImage = file.type.startsWith("image/")
+        const isVideo = file.type.startsWith("video/")
+
+        const imageHash = isImage ? fileHash : ""
+        const videoHash = isVideo ? fileHash : ""
+
+        // Prepare and send the transaction to the smart contract
+        const transaction = prepareContractCall({
+          contract: SocialContract,
+          method:
+            "function createPost(string _title, string _description, string _imageHash, string _videoHash, string _tags)",
+          params: [location, caption, imageHash, videoHash, tags],
+        })
+
+        const { transactionHash } = await sendTransaction({
+          transaction,
+          account,
+        })
+
+        console.log(
+          "Post created successfully with transaction hash:",
+          transactionHash,
+        )
+      }
+    } catch (error) {
+      console.error("Error creating post:", error)
+    }
   }
 
   const renderFilePreview = () => {
@@ -88,32 +121,27 @@ const CreatePost: React.FC = () => {
   return (
     <div className="relative">
       <Vanta />
-      <div
-        className="relative z-10 max-w-md mx-auto p-6 bg-black
-       bg-opacity-30 border-2 border-white rounded-lg"
-      >
+      <div className="relative z-10 max-w-md mx-auto p-6 bg-black bg-opacity-30 border-2 border-white rounded-lg">
         <div className="mt-20">
           <h1 className="my-12 text-3xl font-extrabold text-white flex flex-row gap-2">
             <MdLibraryAdd className="mt-1 font-3xl" />
             Create Post
           </h1>
           <div
-            ref={drop}
-            onClick={triggerFileInput} // Trigger file input click
-            className={`border-2 h-40 border-dashed border-gray-400 p-4 ${isOver ? "bg-gray-200" : "bg-white"} flex flex-col items-center cursor-pointer rounded-md`}
+            onClick={triggerFileInput}
+            className="border-2 h-40 border-dashed border-gray-400 p-4 bg-white flex flex-col items-center cursor-pointer rounded-md"
           >
             <FaCloudUploadAlt className="text-4xl text-gray-600 mb-2" />
-            <p className="text-gray-600">
-              Drag and drop a file here, or click to select one
-            </p>
+            <p className="text-gray-600">Click to select a file</p>
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
               className="hidden"
-              accept="image/*,video/*" // Accept image and video files
+              accept="image/*,video/*"
             />
           </div>
+          {errors.file && <p className="text-red-500 mt-2">{errors.file}</p>}
           {renderFilePreview()}
           <form onSubmit={handleSubmit} className="mt-4">
             <div className="mb-4">
@@ -127,9 +155,12 @@ const CreatePost: React.FC = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setCaption(e.target.value)
                 }
-                className="w-full border border-gray-300 rounded-md p-2"
+                className="w-full border border-gray-800 text-black rounded-md p-2"
                 placeholder="Enter caption"
               />
+              {errors.caption && (
+                <p className="text-red-500 mt-2">{errors.caption}</p>
+              )}
             </div>
             <div className="mb-4">
               <label htmlFor="tags" className="block text-gray-300 mb-2">
@@ -142,13 +173,16 @@ const CreatePost: React.FC = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setTags(e.target.value)
                 }
-                className="w-full border border-gray-300 rounded-md p-2"
+                className="w-full border text-black border-gray-800 rounded-md p-2"
                 placeholder="Enter tags (comma separated)"
               />
+              {errors.tags && (
+                <p className="text-red-500 mt-2">{errors.tags}</p>
+              )}
             </div>
             <div className="mb-4">
               <label htmlFor="location" className="block text-gray-300 mb-2">
-                Location
+                Title
               </label>
               <input
                 type="text"
@@ -157,9 +191,12 @@ const CreatePost: React.FC = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setLocation(e.target.value)
                 }
-                className="w-full border border-gray-300 rounded-md p-2"
-                placeholder="Enter location"
+                className="w-full border border-gray-800 text-black rounded-md p-2"
+                placeholder="Enter Title"
               />
+              {errors.location && (
+                <p className="text-red-500 mt-2">{errors.location}</p>
+              )}
             </div>
             <button
               type="submit"
