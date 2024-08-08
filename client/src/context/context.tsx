@@ -1,74 +1,83 @@
-import React, { useContext, createContext, ReactNode } from "react";
+import React, { useContext, createContext, ReactNode } from "react"
 import {
   createThirdwebClient,
   getContract,
   defineChain,
   ThirdwebClient,
-} from "thirdweb";
-import { createWallet } from "thirdweb/wallets";
+} from "thirdweb"
+import { createWallet } from "thirdweb/wallets"
 
-const wallets = [createWallet("io.metamask")];
+const wallets = [createWallet("io.metamask")]
 
 interface SocialTokenContextProps {
-  contract1: any;
-  contract2: any;
-  contract3: any;
-  wallets: any;
-  client: any;
+  ICSContract: any
+  SocialContract: any
+  MarketContract: any
+  wallets: any
+  client: any
+  wallet: any
+  account: any
 }
 
-const SocialTokenContext = createContext<SocialTokenContextProps | undefined>(undefined);
+const SocialTokenContext = createContext<SocialTokenContextProps | undefined>(
+  undefined,
+)
 
 const client: ThirdwebClient = createThirdwebClient({
   clientId: import.meta.env.VITE_CLIENT_ID as string,
-});
-
+})
+const wallet = createWallet("io.metamask")
+const account = await wallet.connect({
+  client,
+})
 interface socialTokenContextProviderProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export const SocialTokenContextProvider = ({
   children,
 }: socialTokenContextProviderProps) => {
-  const contract1 = getContract({
+  const ICSContract = getContract({
     client,
     chain: defineChain(3441006),
-    address: import.meta.env.VITE_CONTRACT_ADDRESS_1 as string,
-  });
+    address: import.meta.env.VITE_ICS_CONTRACT_ADDRESS as string,
+  })
 
-  const contract2 = getContract({
+  const SocialContract = getContract({
     client,
-    chain: defineChain(11155111),
-    address: import.meta.env.VITE_CONTRACT_ADDRESS_2 as string,
-  });
+    chain: defineChain(3441006),
+    address: import.meta.env.VITE_SOCIAL_CONTRACT_ADDRESS as string,
+  })
 
-  const contract3 = getContract({
+  const MarketContract = getContract({
     client,
-    chain: defineChain(11155111),
-    address: import.meta.env.VITE_CONTRACT_ADDRESS_3 as string,
-  });
+    chain: defineChain(3441006),
+    address: import.meta.env.VITE_NFT_CONTRACT_ADDRESS as string,
+  })
 
   return (
     <SocialTokenContext.Provider
       value={{
-        contract1,
-        contract2,
-        contract3,
+        ICSContract,
+        SocialContract,
+        MarketContract,
         wallets,
         client,
+        wallet,
+        account,
       }}
     >
       {children}
     </SocialTokenContext.Provider>
-  );
-};
+  )
+}
 
 export const useSocialTokenContext = () => {
-  const context = useContext(SocialTokenContext);
+  const context = useContext(SocialTokenContext)
   if (context === undefined) {
     throw new Error(
       "useVotingContext must be used within a SocialTokenContextProvider",
-    );
+    )
   }
-  return context;
-};
+  return context
+}
