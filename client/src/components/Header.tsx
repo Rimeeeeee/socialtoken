@@ -1,6 +1,9 @@
 import React from "react"
 import { NavLink } from "react-router-dom"
 import { FaUserCircle, FaUserPlus } from "react-icons/fa"
+import { ThirdwebProvider, ConnectButton, darkTheme } from "thirdweb/react"
+import { createWallet, walletConnect } from "thirdweb/wallets"
+import { useSocialTokenContext } from "../context/context"
 
 // Dummy user data for demonstration purposes
 const user = {
@@ -10,6 +13,7 @@ const user = {
 }
 
 const TopBar = () => {
+  const { client, wallets } = useSocialTokenContext()
   return (
     <div
       className="w-full h-16 bg-zinc-950 shadow-sm text-white flex items-center
@@ -39,10 +43,12 @@ const TopBar = () => {
         </span>
       </div>
       {/* Connect button */}
-      <button className="bg-blue-600 text-white py-2 px-4 rounded-md flex items-center space-x-2 hover:bg-blue-700">
-        <FaUserPlus className="text-lg" />
-        <span>Connect</span>
-      </button>
+      <ConnectButton
+        client={client}
+        wallets={wallets}
+        theme={darkTheme({})}
+        connectModal={{ size: "compact" }}
+      />
     </div>
   )
 }
