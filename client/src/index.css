@@ -37,6 +37,21 @@
 .text-primary {
   font-family: "Poppins", sans-serif;
 }
+.buy-now-button {
+  background-color: transparent;
+  border: 1px solid white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.buy-now-button:hover {
+  background: linear-gradient(135deg, #6ee7b7, #3b82f6, #9333ea);
+  color: black;
+}
 
 @layer base {
   body {
