@@ -47,7 +47,7 @@ const App: React.FC = () => {
             path="/"
             element={
               <Layout>
-                <Home />{" "}
+                <Home />
               </Layout>
             }
           />
@@ -77,7 +77,7 @@ const App: React.FC = () => {
             }
           />
           <Route
-            path="/shop"
+            path="/shop/*"
             element={
               <Layout>
                 <Shop />

@@ -1,6 +1,19 @@
-import React from "react"
-
+import React, { MouseEventHandler } from "react"
+import { prepareContractCall, sendTransaction } from "thirdweb"
+import { useSocialTokenContext } from "../context/context"
 const DailyLogin = () => {
+  const { SocialContract, account } = useSocialTokenContext()
+  const checkIn = async () => {
+    const transaction = await prepareContractCall({
+      contract: SocialContract,
+      method: "function dailyCheckinHandler()",
+      params: [],
+    })
+    const { transactionHash } = await sendTransaction({
+      transaction,
+      account,
+    })
+  }
   return (
     <div className="h-screen w-full flex items-center justify-center bg-black text-white">
       <div className="text-center p-6 bg-black border-2 border-white rounded-lg shadow-lg">
@@ -11,7 +24,10 @@ const DailyLogin = () => {
           ⚠️ Warning: This will only work if you haven't collected tokens in the
           last 24 hours.
         </p>
-        <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-full">
+        <button
+          onClick={checkIn}
+          className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-full"
+        >
           Daily Check-in!
         </button>
       </div>

@@ -264,7 +264,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
           />
         )}
         <div className="mt-2 flex gap-1">
-          <h2 className="text-xl font-semibold mt-2">
+          <h2 className="text-xl text-primary font-semibold mt-2">
             {showFullCaption ? (
               captionLines.map((line, index) => (
                 <React.Fragment key={index}>
@@ -293,7 +293,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
           </h2>
         </div>
       </div>
-      <div className="post-actions flex space-x-4 mt-4 justify-between">
+      <div className="post-actions flex space-x-4 mt-4 justify-between px-3">
         <button
           onClick={handleLike}
           className="flex items-center flex-col space-x-1 text-blue-500 hover:text-red-500"
