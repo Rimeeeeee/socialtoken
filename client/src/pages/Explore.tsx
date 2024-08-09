@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { FaSearch, FaFilter, FaArrowUp, FaArrowDown } from "react-icons/fa"
 import Post from "../components/Post"
 import { useSocialTokenContext } from "../context/context"
 import { readContract } from "thirdweb"
@@ -19,6 +20,9 @@ const Explore: React.FC = () => {
   const [posts, setPosts] = useState<PostData[]>([])
   const [page, setPage] = useState<number>(0)
   const [hasMore, setHasMore] = useState<boolean>(true)
+  const [sortByLikes, setSortByLikes] = useState<boolean>(true) // State for sorting order
+  const [searchTags, setSearchTags] = useState<string>("")
+  const [minLikes, setMinLikes] = useState<number>(0)
   const { SocialContract } = useSocialTokenContext()
 
   const loadPosts = async () => {
@@ -33,8 +37,25 @@ const Explore: React.FC = () => {
       // Convert readonly data to mutable data
       const data: PostData[] = [...readonlyData]
 
+      // Filter and search logic
+      const filteredData = data.filter((post) => {
+        const tagsMatch = post.tags
+          .toLowerCase()
+          .includes(searchTags.toLowerCase())
+        const likesMatch = post.likes >= BigInt(minLikes)
+        return tagsMatch && likesMatch
+      })
+
+      // Sort data by likes
+      const sortedData = filteredData.sort(
+        (a, b) =>
+          sortByLikes
+            ? Number(b.likes) - Number(a.likes) // Descending order
+            : Number(a.likes) - Number(b.likes), // Ascending order
+      )
+
       // Reverse and slice data for pagination (10 posts per page)
-      const reversedData = data.reverse()
+      const reversedData = sortedData.reverse()
       const newPosts = reversedData.slice(page * 10, (page + 1) * 10)
 
       // Avoid appending duplicate posts
@@ -57,7 +78,7 @@ const Explore: React.FC = () => {
   useEffect(() => {
     loadPosts()
     // Trigger loadPosts when the page changes
-  }, [page, SocialContract])
+  }, [page, SocialContract, searchTags, minLikes, sortByLikes])
 
   const handleScroll = (e: React.UIEvent<HTMLElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
@@ -68,11 +89,8 @@ const Explore: React.FC = () => {
 
   return (
     <div className="pb-20">
-      <div
-        className="h-screen flex flex-col overflow-y-scroll snap-y snap-mandatory"
-        onScroll={handleScroll}
-      >
-        <div className="mt-16 flex flex-col space-y-4">
+      <div className="h-screen flex flex-col pt-2">
+        <div className="mt-16 flex flex-col space-y-4 no-scrollbar overflow-y-scroll snap-y snap-mandatory">
           {posts.map((post) => (
             <div
               key={post.pid.toString()}

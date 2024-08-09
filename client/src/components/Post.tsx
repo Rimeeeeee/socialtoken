@@ -233,7 +233,10 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
   const captionLines = breakTextIntoLines(caption, 40)
   //console.log(caption)
   return (
-    <div className="relative mt-24 sm:min-w-96 min-w-56 min-h-[70vh] mx-auto p-4 bg-zinc-950 border-white border-2 rounded-lg shadow-md">
+    <div
+      className="relative mt-4 sm:min-w-96 min-w-52 min-h-[60vh] mx-auto p-1
+     bg-zinc-950 border-white border-2 rounded-lg shadow-md"
+    >
       <div className="flex flex-col">
         <div className="flex flex-row gap-2 mb-4">
           <img

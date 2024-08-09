@@ -4,6 +4,7 @@ import { FaUserCircle, FaUserPlus } from "react-icons/fa"
 import { ThirdwebProvider, ConnectButton, darkTheme } from "thirdweb/react"
 import { createWallet, walletConnect } from "thirdweb/wallets"
 import { useSocialTokenContext } from "../context/context"
+import Balance from "./Balance"
 
 // Dummy user data for demonstration purposes
 const user = {
@@ -43,12 +44,17 @@ const TopBar = () => {
         </span>
       </div>
       {/* Connect button */}
-      <ConnectButton
-        client={client}
-        wallets={wallets}
-        theme={darkTheme({})}
-        connectModal={{ size: "compact" }}
-      />
+      <div className="flex flex-row gap-1">
+        <div className="hidden sm:block">
+          <Balance />
+        </div>
+        <ConnectButton
+          client={client}
+          wallets={wallets}
+          theme={darkTheme({})}
+          connectModal={{ size: "compact" }}
+        />
+      </div>
     </div>
   )
 }
