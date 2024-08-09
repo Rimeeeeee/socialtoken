@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { useSocialTokenContext } from "../context/context";
-import { useActiveAccount } from "thirdweb/react";
-import { createWallet } from "thirdweb/wallets";
-import { prepareContractCall, sendTransaction } from "thirdweb";
-import {upload} from "thirdweb/storage";
-// Placeholder function for uploading file to IPFS and getting a hash
-const uploadToIPFS = async (file: File): Promise<string> => {
-  // Simulate file upload and return a mock IPFS hash
-  return new Promise((resolve) => {
-    setTimeout(() => resolve("QmSomeHashFromIPFS"), 1000)
-  })
-}
+import { useSocialTokenContext } from "../context/context"
+import { useActiveAccount } from "thirdweb/react"
+import { createWallet } from "thirdweb/wallets"
+import { prepareContractCall, sendTransaction } from "thirdweb"
+import { upload } from "thirdweb/storage"
 
 const RegisterUser: React.FC = () => {
   // Define the initial state
@@ -19,43 +12,39 @@ const RegisterUser: React.FC = () => {
     caption: "",
     profilePic: "", // Now a string for IPFS hash
     bio: "",
-    
   })
   const [createUserSuccess, setCreateUserSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { SocialContract, wallets,account,client } = useSocialTokenContext();
+  const { SocialContract, wallets, account, client } = useSocialTokenContext()
   const address = useActiveAccount()?.address
   const OWNER = import.meta.env.VITE_OWNER as string
- 
+
   const handleRegister = async () => {
     try {
       if (
         formState.name &&
         formState.caption &&
         formState.profilePic &&
-        formState.bio 
+        formState.bio
       ) {
         const wallet = createWallet("io.metamask")
-        const account = await wallet.connect({ client })
+        const connectedAccount = await wallet.connect({ client })
 
         const transaction = await prepareContractCall({
-          contract:SocialContract,
+          contract: SocialContract,
           method:
             "function register(string _name, string _bio, string _image_hash, string _caption)",
           params: [
             formState.name,
-            formState.bio ,
+            formState.bio,
             formState.profilePic,
-        formState.caption
-       
-        
+            formState.caption,
           ],
-         
         })
 
         const { transactionHash } = await sendTransaction({
           transaction,
-          account,
+          account: connectedAccount,
         })
 
         if (transactionHash) {
@@ -64,9 +53,8 @@ const RegisterUser: React.FC = () => {
           setFormState({
             name: "",
             caption: "",
-            profilePic:"",
-            bio:""
-           
+            profilePic: "",
+            bio: "",
           })
         }
       } else {
@@ -77,12 +65,14 @@ const RegisterUser: React.FC = () => {
       setError("Failed to create user.")
     }
   }
+
   useEffect(() => {
-    setTimeout(() => {
-      setError("")
-    }, 3000)
-    return () => {}
+    if (error) {
+      const timer = setTimeout(() => setError(null), 3000)
+      return () => clearTimeout(timer)
+    }
   }, [error])
+
   // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<
@@ -98,28 +88,27 @@ const RegisterUser: React.FC = () => {
 
   // Handle file input change
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
       try {
         const uris = await upload({
           client,
-          files: [file], // Correctly pass File object and file name
-        });
+          files: [file],
+        })
         setFormState((prevState) => ({
           ...prevState,
-          profilePic: uris,
-        }));
+          profilePic: uris, // Set the first URI
+        }))
       } catch (error) {
-        console.error("Error uploading file to IPFS:", error);
+        console.error("Error uploading file to IPFS:", error)
       }
     }
-  };
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     handleRegister()
   }
-  // Handle form submission
-  
 
   return (
     <div className="flex items-center justify-center h-[85vh] bg-transparent text-white p-4">
@@ -185,7 +174,6 @@ const RegisterUser: React.FC = () => {
               className="mt-1 p-2 border border-gray-800 bg-zinc-950 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
 
           <button
             type="submit"

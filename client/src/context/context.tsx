@@ -5,9 +5,15 @@ import {
   defineChain,
   ThirdwebClient,
 } from "thirdweb"
-import { createWallet } from "thirdweb/wallets"
+import { createWallet, walletConnect } from "thirdweb/wallets"
 
-const wallets = [createWallet("io.metamask")]
+const wallets = [
+  createWallet("io.metamask"),
+  createWallet("com.coinbase.wallet"),
+  walletConnect(),
+  createWallet("com.trustwallet.app"),
+  createWallet("me.rainbow"),
+]
 
 interface SocialTokenContextProps {
   ICSContract: any
