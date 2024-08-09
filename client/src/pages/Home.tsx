@@ -35,7 +35,7 @@ const Home = () => {
           <h1 className="sm:text-7xl text-2xl font-bold">
             Welcome to{" "}
             <span className="dancing-script-500 text-gradient font-bold text-3xl sm:text-8xl">
-              Enigma
+              SocialT
             </span>
           </h1>
           <p className="mt-4 text-xl sm:text-6xl">

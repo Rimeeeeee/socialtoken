@@ -95,7 +95,7 @@ const TopBar: React.FC = () => {
       </div>
       <div>
         <span className="dancing-script-500 text-gradient font-bold text-xl sm:text-4xl ml-14 sm:ml-0">
-          Enigma
+          SocialT
         </span>
       </div>
       {/* Connect button */}
