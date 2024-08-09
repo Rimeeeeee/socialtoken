@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
-import Rings from "../components/Rings";
-import RegisterUser from "../components/RegisterUser";
-import { Navigate } from "react-router-dom";
-import { useActiveAccount } from "thirdweb/react";
-import { readContract } from "thirdweb";
-import { useSocialTokenContext } from "../context/context";
-import TopBar from "../components/Header"; // Import the TopBar component
+import React, { useState, useEffect } from "react"
+import Rings from "../components/Rings"
+import RegisterUser from "../components/RegisterUser"
+import { Navigate } from "react-router-dom"
+import { useActiveAccount } from "thirdweb/react"
+import { readContract } from "thirdweb"
+import { useSocialTokenContext } from "../context/context"
+import TopBar from "../components/Header" // Import the TopBar component
 
 const Login: React.FC = () => {
-  const [registered, setRegistered] = useState(false);
-  const address = useActiveAccount()?.address;
-  const { SocialContract } = useSocialTokenContext();
+  const [registered, setRegistered] = useState(false)
+  const address = useActiveAccount()?.address
+  const { SocialContract } = useSocialTokenContext()
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -20,19 +20,19 @@ const Login: React.FC = () => {
             contract: SocialContract,
             method: "function isAUser(address) view returns (bool)",
             params: [address],
-          });
-          setRegistered(response);
+          })
+          setRegistered(response)
         } catch (error) {
-          console.error("Failed to check user status", error);
+          console.error("Failed to check user status", error)
         }
       }
-    };
+    }
 
-    checkUserStatus();
-  }, [address, SocialContract]);
+    checkUserStatus()
+  }, [address, SocialContract])
 
   if (registered) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" />
   }
 
   return (
@@ -51,7 +51,7 @@ const Login: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
