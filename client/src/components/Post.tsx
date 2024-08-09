@@ -4,6 +4,7 @@ import { FaGift } from "react-icons/fa"
 import { prepareContractCall, readContract, sendTransaction } from "thirdweb"
 import { useSocialTokenContext } from "../context/context"
 import { download } from "thirdweb/storage"
+import { useNavigate } from "react-router-dom"
 interface PostData {
   pid: bigint
   creator: string
@@ -35,7 +36,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
   const [amount, setAmount] = useState(0)
   const { SocialContract, client, account, ICSContract } =
     useSocialTokenContext()
-
+  const navigate = useNavigate()
   useEffect(() => {
     const getPost = async () => {
       if (pid) {
@@ -56,7 +57,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
               "function posts(uint256) view returns (uint256 pid, address creator, string image_hash, string title, string description, string videos, uint256 likes, uint256 shares, string tags)",
             params: [BigInt(pid)],
           })
-          console.log(result)
+          // console.log(result)
           // Destructure the result tuple and assign to a PostData object
           const data: PostData = {
             pid: result[0],
@@ -70,7 +71,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
             tags: result[8],
           }
 
-          console.log(data)
+          //console.log(data)
           const ipfsHash = data.image_hash
           setCaption(data.description) // Assuming description is used as the caption
           setLikes(Number(data.likes))
@@ -108,11 +109,11 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
           params: [creator],
         })
 
-        console.log("Contract Data:", data) // Debugging: Log the entire response
+        // console.log("Contract Data:", data) // Debugging: Log the entire response
 
         // Ensure data is structured as expected
         if (data && data.name) {
-          console.log("User Name:", data.name) // Debugging: Log the name to verify it's there
+          // console.log("User Name:", data.name) // Debugging: Log the name to verify it's there
           setUserName(data.name)
         } else {
           console.warn("No name found in the data.")
@@ -160,8 +161,8 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
   }
 
   const handleShare = async () => {
-    const copyText = `${pid}`
-    navigator.clipboard.writeText(copyText)
+    // const copyText = `${pid}`
+    //  navigator.clipboard.writeText(copyText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
     if (pid) {
@@ -238,7 +239,10 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
      bg-zinc-950 border-white border-2 rounded-lg shadow-md"
     >
       <div className="flex flex-col">
-        <div className="flex flex-row gap-2 mb-4">
+        <div
+          onClick={() => navigate(`/profile/${creator}`)}
+          className="flex flex-row gap-2 mb-4 border-2 border-white"
+        >
           <img
             className="h-14 w-14 border border-white rounded-full"
             src={profilePic}
@@ -326,7 +330,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
           className="flex flex-col items-center space-x-1 text-blue-500 hover:text-blue-700"
         >
           <FaShareAlt />
-          <span>{copied ? "Copied!" : ""}</span>
+          {/* <span>{copied ? "Copied!" : ""}</span> */}
           <div className="text-blue-500">{shares}</div>
         </button>
       </div>

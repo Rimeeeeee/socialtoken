@@ -1,12 +1,32 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Link, Navigate } from "react-router-dom"
+import { useActiveAccount } from "thirdweb/react"
+import { useSocialTokenContext } from "../context/context"
+import { readContract } from "thirdweb"
 
 const Home = () => {
   const [registered, setRegistered] = useState(true)
-
+  const { SocialContract } = useSocialTokenContext()
+  const address = useActiveAccount()?.address
   if (!registered) {
     return <Navigate to="/login" />
   }
+  useEffect(() => {
+    if (address) {
+      const isUser = async () => {
+        const data = await readContract({
+          contract: SocialContract,
+          method: "function isAUser(address) view returns (bool)",
+          params: [address],
+        })
+        setRegistered(data)
+        console.log(data)
+      }
+      isUser()
+    }
+
+    return () => {}
+  }, [SocialContract])
 
   return (
     <div className="h-screen text-primary">
@@ -25,7 +45,10 @@ const Home = () => {
             <Link to="/explore" className="button-p">
               Explore Posts
             </Link>
-            <Link to="/profile/:userId" className="button-p">
+            <Link
+              to={`/profile/${useActiveAccount()?.address}`}
+              className="button-p"
+            >
               Your Profile
             </Link>
             <Link to="/shop" className="button-p">

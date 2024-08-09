@@ -49,6 +49,7 @@ const RegisterUser: React.FC = () => {
 
         if (transactionHash) {
           setCreateUserSuccess(true)
+          alert("Registered Successfully")
           setTimeout(() => setCreateUserSuccess(false), 3000)
           setFormState({
             name: "",

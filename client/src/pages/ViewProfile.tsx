@@ -1,15 +1,13 @@
-import React, { useEffect, useId, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { AiOutlineUser, AiOutlineTeam } from "react-icons/ai"
 import { useParams, Link } from "react-router-dom"
 import { FaTimes } from "react-icons/fa"
 import Post from "../components/Post"
 import FollowButton from "../components/FollowButton"
-// Import Balance component
 import { readContract } from "thirdweb"
 import { useSocialTokenContext } from "../context/context"
 import { download } from "thirdweb/storage"
 import Balance from "../components/Balance"
-// import useEffect from 'react';
 
 const ViewProfile: React.FC = () => {
   const { userId } = useParams() // Use userId instead of id
@@ -19,8 +17,7 @@ const ViewProfile: React.FC = () => {
   const [imageUrl, setImageUrl] = useState<string>("")
   const [isVisible, setIsVisible] = useState(false)
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null)
-  const [posts, setPosts] = useState<any>(null)
-  // const [username, setUsername] = useState<any>(null)
+  const [posts, setPosts] = useState<any[]>([])
 
   useEffect(() => {
     const getUser = async () => {
@@ -43,14 +40,20 @@ const ViewProfile: React.FC = () => {
             posts: data.content,
           })
 
-          const response = await download({
-            client,
-            uri: `${data.image_hash}`,
-          })
+          try {
+            const response = await download({
+              client,
+              uri: `${data.image_hash}`,
+            })
 
-          const fileBlob = await response.blob()
-          const fileUrl = URL.createObjectURL(fileBlob)
-          setImageUrl(fileUrl)
+            const fileBlob = await response.blob()
+            const fileUrl = URL.createObjectURL(fileBlob)
+            setImageUrl(fileUrl)
+          } catch (error) {
+            console.error("Failed to fetch user image", error)
+            // Set a dummy image URL if there's an error
+            setImageUrl("path_to_dummy_image.jpg")
+          }
         } catch (error) {
           console.error("Failed to fetch user data", error)
         }
@@ -71,35 +74,40 @@ const ViewProfile: React.FC = () => {
             params: [userId],
           })
 
-          // Fetch and store image URLs directly
           const imageHashesAndPids = await Promise.all(
             results.map(async (result) => {
-              const response = await download({
-                client,
-                uri: result.image_hash,
-              })
+              let fileUrl = ""
+              try {
+                const response = await download({
+                  client,
+                  uri: result.image_hash,
+                })
 
-              const fileBlob = await response.blob()
-              const fileUrl = URL.createObjectURL(fileBlob)
+                const fileBlob = await response.blob()
+                fileUrl = URL.createObjectURL(fileBlob)
+              } catch (error) {
+                console.error("Failed to fetch post image", error)
+                // Use a dummy image URL if the download fails
+                fileUrl = "path_to_dummy_image.jpg"
+              }
 
               return {
                 pid: result.pid,
-                image_url: fileUrl, // Replace image_hash with the actual image URL
+                image_url: fileUrl, // Use the resolved or dummy image URL
               }
             }),
           )
           setPosts(imageHashesAndPids)
           console.log(imageHashesAndPids) // Log to see the extracted values
         } catch (error) {
-          console.error("Failed to fetch user data", error)
+          console.error("Failed to fetch posts", error)
         }
       }
 
       getPosts()
     }
-
-    return () => {}
   }, [userId, SocialContract, client])
+
   const handlePostClick = (index: number) => {
     setSelectedPostId(index)
     setIsVisible(true)
@@ -151,7 +159,6 @@ const ViewProfile: React.FC = () => {
                 </span>
               </Link>
             </div>
-            {/* Conditionally render Balance or FollowButton based on active account */}
             {account?.address === userId ? (
               <Balance /> // Show Balance component if account matches userId
             ) : (
@@ -166,13 +173,18 @@ const ViewProfile: React.FC = () => {
           {(posts || []).map((post: any, index: any) => (
             <div
               key={post.pid} // Use pid as the unique key
-              className=" h-40 flex items-center justify-center cursor-pointer"
+              className="h-40 flex items-center justify-center cursor-pointer relative"
               onClick={() => handlePostClick(post.pid)} // Use pid as the postId
             >
               <img
-                src={`${post.image_url}`}
+                src={post.image_url} // Use image_url here
                 alt={`Post ${index + 1}`}
                 className="h-full w-full object-cover"
+                onError={(e) => {
+                  // Set a dummy image if the image fails to load
+                  ;(e.target as HTMLImageElement).src =
+                    "path_to_dummy_image.jpg"
+                }}
               />
               {/* <p className="absolute text-white text-lg">Post {index + 1}</p> */}
             </div>
