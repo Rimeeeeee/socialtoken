@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react";
 import {
   FaHome,
   FaCompass,
@@ -7,23 +7,65 @@ import {
   FaClipboardList,
   FaBars,
   FaTimes,
-} from "react-icons/fa"
-import { FaCalendarCheck } from "react-icons/fa"
-import { MdAddAPhoto } from "react-icons/md"
-import { NavLink } from "react-router-dom"
+} from "react-icons/fa";
+import { FaCalendarCheck } from "react-icons/fa";
+import { MdAddAPhoto } from "react-icons/md";
+import { NavLink } from "react-router-dom";
+import { useSocialTokenContext } from "../context/context";
+import { download } from "thirdweb/storage";
+import { useActiveAccount } from "thirdweb/react";
+import { readContract } from "thirdweb";
 
-const user = {
-  username: "John Doe",
-  profilePic: "https://via.placeholder.com/40",
-  userId: "12345",
-}
+const SideBar: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(true);
+  const [user, setUser] = useState<any>(null); // Replace `any` with a proper type if available
+  const { SocialContract, client } = useSocialTokenContext();
+  const address = useActiveAccount()?.address;
 
-const SideBar = () => {
-  const [isOpen, setIsOpen] = useState(true)
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (address && SocialContract) {
+        try {
+          const data = await readContract({
+            contract: SocialContract,
+            method: "function getUserById(address _user) view returns ((uint256 uid, address userid, string name, string bio, string image_hash, string caption, uint256 dailylikes, uint256 dailyshares, uint256 dailycheckin, uint256[] dailycheckins, uint256[] dailylikestamp, uint256[] dailysharestamp, uint256[] pid, address[] followers, address[] following, (uint256 pid, address creator, string image_hash, string title, string description, string videos, uint256 likes, uint256 shares, string tags)[] content, uint256 token))",
+            params: [address],
+          });
+
+          // Fetch the image
+          if (data.image_hash) {
+            const response = await download({
+              client,
+              uri: data.image_hash,
+            });
+            const fileBlob = await response.blob();
+            const fileUrl = URL.createObjectURL(fileBlob);
+            setUser({
+              username: data.name,
+              profilePic: fileUrl,
+              userId: data.userid,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to fetch user data", error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [address, SocialContract, client]);
 
   const toggleSidebar = () => {
-    setIsOpen(!isOpen)
-  }
+    setIsOpen(!isOpen);
+  };
+
+  // Function to slice the userId
+  const sliceUserId = (userId: string) => {
+    if (userId.length > 11) {
+      return `${userId.slice(0, 9)}...${userId.slice(-2)}`;
+    }
+    return userId;
+  };
 
   return (
     <div
@@ -34,24 +76,35 @@ const SideBar = () => {
         <div
           className={`p-2 text-2xl font-semibold flex flex-col items-center ${!isOpen && "hidden"}`}
         >
-          <NavLink
-            to={`/profile/${user.userId}`}
-            className="flex items-center space-x-2 mt-8"
-          >
-            <img
-              src={user.profilePic}
-              alt="Profile"
-              className="w-10 h-10 rounded-full"
-            />
-
-            <div>
-              <div className="text-lg text-wrap">{user.username}</div>
-              <div className="text-sm text-gray-700">@{user.userId}</div>
+          {user ? (
+            <NavLink
+              to={`/profile/${user.userId}`}
+              className="flex items-center space-x-2 mt-8"
+            >
+              <img
+                src={user.profilePic}
+                alt="Profile"
+                className="w-10 h-10 rounded-full"
+              />
+              <div>
+                <div className="text-lg text-wrap">{user.username}</div>
+                <div className="text-sm text-gray-700">
+                  @{sliceUserId(user.userId)}
+                </div>
+              </div>
+            </NavLink>
+          ) : (
+            <div className="flex items-center space-x-2 mt-8">
+              <div className="w-10 h-10 rounded-full bg-gray-500"></div>
+              <div>
+                <div className="text-lg text-wrap">Loading...</div>
+                <div className="text-sm text-gray-700">Loading...</div>
+              </div>
             </div>
-          </NavLink>
+          )}
           <button
             onClick={toggleSidebar}
-            className="text-4xl mt-7 ml-1 absolute top-4 right-4 "
+            className="text-4xl mt-7 ml-1 absolute top-4 right-4"
           >
             <FaTimes />
           </button>
@@ -137,7 +190,7 @@ const SideBar = () => {
         </button>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default SideBar
+export default SideBar;

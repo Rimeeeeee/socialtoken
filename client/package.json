@@ -9,6 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "ethers": "^6.13.2",
     "react": "^18.3",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",

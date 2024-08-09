@@ -1,5 +1,9 @@
-import React, { useState } from "react"
-
+import React, { useEffect, useState } from "react"
+import { useSocialTokenContext } from "../context/context";
+import { useActiveAccount } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
+import { prepareContractCall, sendTransaction } from "thirdweb";
+import {upload} from "thirdweb/storage";
 // Placeholder function for uploading file to IPFS and getting a hash
 const uploadToIPFS = async (file: File): Promise<string> => {
   // Simulate file upload and return a mock IPFS hash
@@ -12,14 +16,73 @@ const RegisterUser: React.FC = () => {
   // Define the initial state
   const [formState, setFormState] = useState({
     name: "",
-    userID: "",
+    caption: "",
     profilePic: "", // Now a string for IPFS hash
     bio: "",
-    location: "",
-    gender: "", // Added gender
-    link: "", // Added link
+    
   })
+  const [createUserSuccess, setCreateUserSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const { SocialContract, wallets,account,client } = useSocialTokenContext();
+  const address = useActiveAccount()?.address
+  const OWNER = import.meta.env.VITE_OWNER as string
+ 
+  const handleRegister = async () => {
+    try {
+      if (
+        formState.name &&
+        formState.caption &&
+        formState.profilePic &&
+        formState.bio 
+      ) {
+        const wallet = createWallet("io.metamask")
+        const account = await wallet.connect({ client })
 
+        const transaction = await prepareContractCall({
+          contract:SocialContract,
+          method:
+            "function register(string _name, string _bio, string _image_hash, string _caption)",
+          params: [
+            formState.name,
+            formState.bio ,
+            formState.profilePic,
+        formState.caption
+       
+        
+          ],
+         
+        })
+
+        const { transactionHash } = await sendTransaction({
+          transaction,
+          account,
+        })
+
+        if (transactionHash) {
+          setCreateUserSuccess(true)
+          setTimeout(() => setCreateUserSuccess(false), 3000)
+          setFormState({
+            name: "",
+            caption: "",
+            profilePic:"",
+            bio:""
+           
+          })
+        }
+      } else {
+        setError("Please fill all fields correctly.")
+      }
+    } catch (err) {
+      console.error("Error creating user:", err)
+      setError("Failed to create user.")
+    }
+  }
+  useEffect(() => {
+    setTimeout(() => {
+      setError("")
+    }, 3000)
+    return () => {}
+  }, [error])
   // Handle input changes
   const handleChange = (
     e: React.ChangeEvent<
@@ -35,26 +98,28 @@ const RegisterUser: React.FC = () => {
 
   // Handle file input change
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
       try {
-        const ipfsHash = await uploadToIPFS(file) // Upload file and get IPFS hash
+        const uris = await upload({
+          client,
+          files: [file], // Correctly pass File object and file name
+        });
         setFormState((prevState) => ({
           ...prevState,
-          profilePic: ipfsHash,
-        }))
+          profilePic: uris,
+        }));
       } catch (error) {
-        console.error("Error uploading file to IPFS:", error)
+        console.error("Error uploading file to IPFS:", error);
       }
     }
-  }
-
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  };
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission logic here
-    console.log(formState)
+    handleRegister()
   }
+  // Handle form submission
+  
 
   return (
     <div className="flex items-center justify-center h-[85vh] bg-transparent text-white p-4">
@@ -79,15 +144,15 @@ const RegisterUser: React.FC = () => {
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="userID" className="text-sm font-medium">
-              User ID:
+            <label htmlFor="caption" className="text-sm font-medium">
+              Caption:
             </label>
             <input
               type="text"
-              id="userID"
-              name="userID"
-              placeholder="Enter your User ID"
-              value={formState.userID}
+              id="caption"
+              name="caption"
+              placeholder="Enter a caption for viewers"
+              value={formState.caption}
               onChange={handleChange}
               className="mt-1 p-2 border border-gray-800 bg-zinc-950 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -121,53 +186,6 @@ const RegisterUser: React.FC = () => {
             />
           </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="location" className="text-sm font-medium">
-              Location:
-            </label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              placeholder="Enter your location"
-              value={formState.location}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-800 bg-zinc-950 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <label htmlFor="gender" className="text-sm font-medium">
-              Gender:
-            </label>
-            <select
-              id="gender"
-              name="gender"
-              value={formState.gender}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-800 bg-zinc-950 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col">
-            <label htmlFor="link" className="text-sm font-medium">
-              Link:
-            </label>
-            <input
-              type="url"
-              id="link"
-              name="link"
-              placeholder="Enter your link"
-              value={formState.link}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-800 bg-zinc-950 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
 
           <button
             type="submit"

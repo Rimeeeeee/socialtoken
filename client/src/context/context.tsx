@@ -76,7 +76,7 @@ export const useSocialTokenContext = () => {
   const context = useContext(SocialTokenContext)
   if (context === undefined) {
     throw new Error(
-      "useVotingContext must be used within a SocialTokenContextProvider",
+      "useSocialContext must be used within a SocialTokenContextProvider",
     )
   }
   return context

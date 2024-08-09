@@ -1,10 +1,10 @@
-import React from "react"
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
-} from "react-router-dom"
+} from "react-router-dom";
 import {
   Explore,
   Home,
@@ -12,33 +12,37 @@ import {
   Profile,
   Shop,
   CreatePost,
-  CurrentUser,
   DailyLogin,
-} from "./pages/index"
-import SideBar from "./components/SideBar"
-import Header from "./components/Header"
-import { DndProvider } from "react-dnd"
-import { HTML5Backend } from "react-dnd-html5-backend"
+} from "./pages/index";
+import SideBar from "./components/SideBar";
+import Header from "./components/Header";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import ViewProfile from "./pages/ViewProfile";
+import FollowersPage from "./components/Followers"; // Import the FollowersPage component
+import { useSocialTokenContext } from "./context/context"; // Assuming you have context for contract
+import FollowingPage from "./components/Following";
 
 interface LayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
-// Component to conditionally render SideBar and Header
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const location = useLocation()
-  const isLoginPage = location.pathname === "/login"
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/login";
 
   return (
-    <div className="">
+    <div>
       {!isLoginPage && <SideBar />}
       {!isLoginPage && <Header />}
       <div className="flex-grow">{children}</div>
     </div>
-  )
-}
+  );
+};
 
 const App: React.FC = () => {
+  const { SocialContract } = useSocialTokenContext(); // Assuming you have a context hook for SocialContract
+
   return (
     <Router>
       <DndProvider backend={HTML5Backend}>
@@ -47,7 +51,7 @@ const App: React.FC = () => {
             path="/"
             element={
               <Layout>
-                <Home />{" "}
+                <Home />
               </Layout>
             }
           />
@@ -96,14 +100,30 @@ const App: React.FC = () => {
             path="/profile/:userId"
             element={
               <Layout>
-                <CurrentUser />
+                <ViewProfile />
+              </Layout>
+            }
+          />
+          <Route
+            path="/followers/:creatorAddress"
+            element={
+              <Layout>
+                <FollowersPage contract={SocialContract} />
+              </Layout>
+            }
+          />
+           <Route
+            path="/following/:creatorAddress"
+            element={
+              <Layout>
+                <FollowingPage contract={SocialContract} />
               </Layout>
             }
           />
         </Routes>
       </DndProvider>
     </Router>
-  )
-}
+  );
+};
 
-export default App
+export default App;
