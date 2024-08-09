@@ -15,6 +15,16 @@ const Shop: React.FC = () => {
           <Route path="my-nft" element={<MyNFT />} />
           <Route path="create-nft" element={<CreateNFT />} />
         </Routes>
+        <div className="w-full flex justify-center items-center flex-col ">
+          <h2 className="text-3xl sm:text-5xl font-bold text-primary text-gradient">
+            Spend your ICS Tokens here!!!
+          </h2>
+          <p className="mt-20 text-blue-600">
+            Note:: The market has a small platform fee of
+            <span className="text-primary text-xl text-teal-400 m-2">10</span>
+            ICS Tokens
+          </p>
+        </div>
       </div>
     </div>
   )

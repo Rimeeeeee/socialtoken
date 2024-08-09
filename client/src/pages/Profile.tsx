@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from "react";
-import User from "../components/User";
-import { FaSearch } from "react-icons/fa";
-import { useSocialTokenContext } from "../context/context";
-import { readContract } from "thirdweb";
-import { download } from "thirdweb/storage";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react"
+import User from "../components/User"
+import { FaSearch } from "react-icons/fa"
+import { useSocialTokenContext } from "../context/context"
+import { readContract } from "thirdweb"
+import { download } from "thirdweb/storage"
+import { useNavigate } from "react-router-dom"
 
 const Profile: React.FC = () => {
   // Define state for user data, loading, and error
-  const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const { client, SocialContract } = useSocialTokenContext();
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [users, setUsers] = useState<any[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const { client, SocialContract } = useSocialTokenContext()
+  const [searchQuery, setSearchQuery] = useState<string>("")
 
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate() // Hook for navigation
 
   // Fetch data from the contract when the component mounts
   useEffect(() => {
@@ -22,9 +22,10 @@ const Profile: React.FC = () => {
       try {
         const totalUsers = await readContract({
           contract: SocialContract,
-          method: "function getAllUsers() view returns ((uint256 uid, address userid, string name, string bio, string image_hash, string caption, uint256 dailylikes, uint256 dailyshares, uint256 dailycheckin, uint256[] dailycheckins, uint256[] dailylikestamp, uint256[] dailysharestamp, uint256[] pid, address[] followers, address[] following, (uint256 pid, address creator, string image_hash, string title, string description, string videos, uint256 likes, uint256 shares, string tags)[] content, uint256 token)[])",
+          method:
+            "function getAllUsers() view returns ((uint256 uid, address userid, string name, string bio, string image_hash, string caption, uint256 dailylikes, uint256 dailyshares, uint256 dailycheckin, uint256[] dailycheckins, uint256[] dailylikestamp, uint256[] dailysharestamp, uint256[] pid, address[] followers, address[] following, (uint256 pid, address creator, string image_hash, string title, string description, string videos, uint256 likes, uint256 shares, string tags)[] content, uint256 token)[])",
           params: [],
-        });
+        })
 
         // Resolve IPFS image URLs for each user
         const usersWithImages = await Promise.all(
@@ -32,31 +33,32 @@ const Profile: React.FC = () => {
             const response = await download({
               client,
               uri: user.image_hash, // Using the IPFS URI format
-            });
-            const fileBlob = await response.blob();
-            const fileUrl = URL.createObjectURL(fileBlob);
-            return { ...user, image_url: fileUrl };
-          })
-        );
+            })
+            const fileBlob = await response.blob()
+            const fileUrl = URL.createObjectURL(fileBlob)
+            return { ...user, image_url: fileUrl }
+          }),
+        )
 
-        setUsers(usersWithImages);
-        setLoading(false);
+        setUsers(usersWithImages)
+        setLoading(false)
       } catch (error: any) {
-        setError(error.message);
-        setLoading(false);
+        setError(error.message)
+        setLoading(false)
       }
-    };
+    }
 
     if (SocialContract) {
-      fetchData();
+      fetchData()
     }
-  }, [SocialContract, client]);
+  }, [SocialContract, client])
 
   // Filter users based on search input (by name or user ID)
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.userid.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.userid.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
 
   return (
     <div className="flex flex-col items-center p-4">
@@ -80,7 +82,7 @@ const Profile: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-8 lg:gap-10 mt-5 no-scrollbar">
           {filteredUsers.map((user, index) => {
-            const slicedUserId = `${user.userid.slice(0, 9)}...${user.userid.slice(-2)}`; // Slice the user ID
+            const slicedUserId = `${user.userid.slice(0, 9)}...${user.userid.slice(-2)}` // Slice the user ID
             return (
               <div
                 key={index}
@@ -93,12 +95,12 @@ const Profile: React.FC = () => {
                   userId={slicedUserId} // Pass the sliced user ID
                 />
               </div>
-            );
+            )
           })}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile
