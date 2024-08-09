@@ -256,13 +256,15 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
         {title}
       </h1>
       <div className="post-content max-h-[85vh] p-2">
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt="Post content"
-            className="rounded-lg sm:max-h-[50vh] h-[45vh] object-cover"
-          />
-        )}
+        <div className="flex items-center justify-center">
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt="Post content"
+              className="rounded-lg sm:max-h-[50vh] h-[45vh] object-cover "
+            />
+          )}
+        </div>
         <div className="mt-2 flex gap-1">
           <h2 className="text-xl text-primary font-semibold mt-2">
             {showFullCaption ? (
