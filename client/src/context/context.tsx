@@ -34,9 +34,14 @@ const client: ThirdwebClient = createThirdwebClient({
   clientId: import.meta.env.VITE_CLIENT_ID as string,
 })
 const wallet = createWallet("io.metamask")
-const account = await wallet.connect({
+let account:any
+const a=async()=>{
+const acc = await wallet.connect({
   client,
 })
+account=acc
+}
+a()
 interface socialTokenContextProviderProps {
   children: ReactNode
 }
