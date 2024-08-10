@@ -185,7 +185,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
         contract: ICSContract,
         method:
           "function approve(address spender, uint256 value) returns (bool)",
-        params: [spender, BigInt(amount)],
+        params: [spender, BigInt(amount * 1e18)],
       })
       const { transactionHash } = await sendTransaction({
         transaction,
@@ -195,7 +195,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
   }
   const handleGift = async () => {
     if (pid) {
-      approve()
+      await approve()
       const transaction = await prepareContractCall({
         contract: SocialContract,
         method: "function sendMoneyToPostCreator(uint256 _p, uint256 _amount)",
@@ -241,7 +241,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
       <div className="flex flex-col">
         <div
           onClick={() => navigate(`/profile/${creator}`)}
-          className="flex flex-row gap-2 mb-4 border-2 border-white"
+          className="flex flex-row gap-2 mb-4 "
         >
           <img
             className="h-14 w-14 border border-white rounded-full"
@@ -316,7 +316,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
           </button>
           <input
             type="number"
-            className="w-14 h-4 ml-1 mt-[1px] rounded-lg p-2 text-sm text-black focus:border-blue-500 focus:border outline-none focus:outline-none"
+            className="w-16 sm:w-24 h-5 ml-1 rounded-lg p-2 text-sm text-black focus:border-blue-500 focus:border outline-none focus:outline-none"
             id="amount"
             value={amount}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
