@@ -534,7 +534,7 @@ contract NFTMarketplace is ERC721URIStorage {
         return NFTOwnedByAddress[a];
     }
 
-    function sellNFT(uint256 _tokenId, uint256 tokenValue) public payable {
+    function sellNFT(uint256 _tokenId, uint256 tokenValue) public {
         uint256 price = idToNFT[_tokenId].price;
         address seller = idToNFT[_tokenId].seller;
         if (tokenValue * (10 ** icsToken.decimals()) != price)
@@ -592,6 +592,10 @@ contract NFTMarketplace is ERC721URIStorage {
     function payFromContract(address a, uint256 b) internal {
         icsToken.approve(address(this), b);
         icsToken.transferFrom(address(this), a, b);
+    }
+
+    function getAllNFTs() public view returns (NFT[] memory) {
+        return allListedNFTs;
     }
 
     modifier onlyOwner() {

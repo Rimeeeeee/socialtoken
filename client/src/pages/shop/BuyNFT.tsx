@@ -1,43 +1,60 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import NFT from "./NFT"
+import { readContract } from "thirdweb"
+import { useSocialTokenContext } from "../../context/context"
 
 const BuyNFT: React.FC = () => {
+  const { MarketContract, SocialContract, account, client } =
+    useSocialTokenContext()
+  const [nfts, setNfts] = useState<any[]>([])
+  const [userDetails, setUserDetails] = useState<{ [key: string]: any }>({})
+
+  useEffect(() => {
+    const getAllNFT = async () => {
+      const nftData = await readContract({
+        contract: MarketContract,
+        method:
+          "function getAllNFT() view returns ((uint256 tokenId, address owner, address seller, uint256 price, bool currentlyListed)[])",
+        params: [],
+      })
+
+      // Map over the array of NFTs and fetch user details for each owner
+      const detailedNFTs = await Promise.all(
+        nftData.map(async (nft: any) => {
+          const userData = await readContract({
+            contract: SocialContract,
+            method:
+              "function getUserById(address _user) view returns ((uint256 uid, address userid, string name, string bio, string image_hash, string caption, uint256 dailylikes, uint256 dailyshares, uint256 dailycheckin, uint256[] dailycheckins, uint256[] dailylikestamp, uint256[] dailysharestamp, uint256[] pid, address[] followers, address[] following, (uint256 pid, address creator, string image_hash, string title, string description, string videos, uint256 likes, uint256 shares, string tags)[] content, uint256 token))",
+            params: [nft.owner],
+          })
+          return {
+            ...nft,
+            userData, // Include user data along with NFT data
+          }
+        }),
+      )
+
+      setNfts(detailedNFTs)
+    }
+
+    getAllNFT()
+    return () => {}
+  }, [MarketContract, SocialContract, client])
+
   return (
     <div className="h-screen p-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 p-4 overflow-y-auto no-scrollbar mt-12">
-        <NFT
-          creatorName="Creator 1"
-          profilePic="path_to_image"
-          creatorAddress="0x1234...5678"
-          price={100}
-          uri="path_to_nft"
-          tokenId={1}
-        />
-        <NFT
-          creatorName="Creator 2"
-          profilePic="path_to_image"
-          creatorAddress="0x1234...5678"
-          price={200}
-          uri="path_to_nft"
-          tokenId={2}
-        />
-        <NFT
-          creatorName="Creator 3"
-          profilePic="path_to_image"
-          creatorAddress="0x1234...5678"
-          price={300}
-          uri="path_to_nft"
-          tokenId={3}
-        />
-        <NFT
-          creatorName="Creator 3"
-          profilePic="path_to_image"
-          creatorAddress="0x1234...5678"
-          price={300}
-          uri="path_to_nft"
-          tokenId={4}
-        />
-        {/* Add more NFTs as needed */}
+        {nfts.map((nft) => (
+          <NFT
+            key={nft.tokenId}
+            creatorName={nft.userData.name}
+            profilePic={`${nft.userData.image_hash}`}
+            creatorAddress={nft.owner}
+            price={Number(nft.price)}
+            uri={`${nft.userData.image_hash}`}
+            tokenId={Number(nft.tokenId)}
+          />
+        ))}
       </div>
     </div>
   )
