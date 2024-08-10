@@ -1,3 +1,4 @@
+
 import React, { useContext, createContext, ReactNode } from "react"
 import {
   createThirdwebClient,
@@ -58,9 +59,9 @@ export const SocialTokenContextProvider = ({
   const MarketContract = getContract({
     client,
     chain: defineChain(3441006),
-    address: import.meta.env.VITE_NFT_CONTRACT_ADDRESS as string,
+    address: import.meta.env.VITE_CONTRACT_ADDRESS_3 as string,
   })
-
+  
   return (
     <SocialTokenContext.Provider
       value={{

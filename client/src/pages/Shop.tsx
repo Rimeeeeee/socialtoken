@@ -20,7 +20,7 @@ const Shop: React.FC = () => {
       <SideMenu />
       <div className="flex-grow flex items-center justify-center">
         <Routes>
-          {/* <Route path="buy-nft" element={<BuyNFT />} /> */}
+           <Route path="buy-nft" element={<BuyNFT />} /> 
           <Route path="my-nft" element={<MyNFT />} />
           <Route path="create-nft" element={<CreateNFT />} />
         </Routes>
@@ -32,7 +32,7 @@ const Shop: React.FC = () => {
             </h2>
             <p className="mt-20 text-blue-600">
               Note: The market has a small platform fee of
-              <span className="text-primary text-xl text-teal-400 m-2">10</span>
+              <span className="text-primary text-xl text-teal-400 m-2">30</span>
               ICS Tokens
             </p>
           </div>

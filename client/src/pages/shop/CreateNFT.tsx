@@ -142,7 +142,7 @@ const CreateToken: React.FC = () => {
         })
         setFormState((prevState) => ({
           ...prevState,
-          token_image: uris[0], // Set the first URI as token_image
+          token_image: uris, // Set the first URI as token_image
         }))
       } catch (error) {
         console.error("Error uploading file to IPFS:", error)

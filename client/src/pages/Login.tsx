@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import Rings from "../components/Rings"
 import RegisterUser from "../components/RegisterUser"
-import { Navigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import { useActiveAccount } from "thirdweb/react"
 import { readContract } from "thirdweb"
 import { useSocialTokenContext } from "../context/context"
@@ -11,7 +11,7 @@ const Login: React.FC = () => {
   const [registered, setRegistered] = useState(false)
   const address = useActiveAccount()?.address
   const { SocialContract } = useSocialTokenContext()
-
+  const navigate = useNavigate()
   useEffect(() => {
     const checkUserStatus = async () => {
       if (address) {
@@ -21,6 +21,8 @@ const Login: React.FC = () => {
             method: "function isAUser(address) view returns (bool)",
             params: [address],
           })
+          console.log(registered)
+
           setRegistered(response)
         } catch (error) {
           console.error("Failed to check user status", error)
@@ -30,10 +32,16 @@ const Login: React.FC = () => {
 
     checkUserStatus()
   }, [address, SocialContract])
-
-  if (registered) {
-    return <Navigate to="/" />
-  }
+  useEffect(() => {
+    const nav = () => {
+      if (registered) {
+        navigate("/")
+      }
+      console.log(registered)
+    }
+    nav()
+    return () => {}
+  }, [registered])
 
   return (
     <div className="relative w-screen h-screen flex flex-col">

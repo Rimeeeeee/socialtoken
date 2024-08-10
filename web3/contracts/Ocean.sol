@@ -537,8 +537,8 @@ contract NFTMarketplace is ERC721URIStorage {
     function sellNFT(uint256 _tokenId, uint256 tokenValue) public {
         uint256 price = idToNFT[_tokenId].price;
         address seller = idToNFT[_tokenId].seller;
-        if (tokenValue * (10 ** icsToken.decimals()) != price)
-            revert NotEnoughTokens();
+       // if (tokenValue * (10 ** icsToken.decimals()) != price)
+            //revert NotEnoughTokens();
 
         // pay and approve as needed with the frontend
         bool success = pay(seller, tokenValue);

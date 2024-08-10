@@ -14,9 +14,10 @@ const BuyNFT: React.FC = () => {
       const nftData = await readContract({
         contract: MarketContract,
         method:
-          "function getAllNFT() view returns ((uint256 tokenId, address owner, address seller, uint256 price, bool currentlyListed)[])",
+          "function getAllNFTs() view returns ((uint256 tokenId, address owner, address seller, uint256 price, bool currentlyListed)[])",
         params: [],
       })
+      console.log(nftData)
 
       // Map over the array of NFTs and fetch user details for each owner
       const detailedNFTs = await Promise.all(
@@ -25,7 +26,7 @@ const BuyNFT: React.FC = () => {
             contract: SocialContract,
             method:
               "function getUserById(address _user) view returns ((uint256 uid, address userid, string name, string bio, string image_hash, string caption, uint256 dailylikes, uint256 dailyshares, uint256 dailycheckin, uint256[] dailycheckins, uint256[] dailylikestamp, uint256[] dailysharestamp, uint256[] pid, address[] followers, address[] following, (uint256 pid, address creator, string image_hash, string title, string description, string videos, uint256 likes, uint256 shares, string tags)[] content, uint256 token))",
-            params: [nft.owner],
+            params: [nft.seller],
           })
           return {
             ...nft,
@@ -50,6 +51,7 @@ const BuyNFT: React.FC = () => {
             creatorName={nft.userData.name}
             profilePic={`${nft.userData.image_hash}`}
             creatorAddress={nft.owner}
+            sellerAddress={nft.seller}
             price={Number(nft.price)}
             uri={`${nft.userData.image_hash}`}
             tokenId={Number(nft.tokenId)}

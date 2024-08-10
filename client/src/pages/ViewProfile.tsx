@@ -8,11 +8,12 @@ import { readContract } from "thirdweb"
 import { useSocialTokenContext } from "../context/context"
 import { download } from "thirdweb/storage"
 import Balance from "../components/Balance"
+import { useActiveAccount } from "thirdweb/react"
 
 const ViewProfile: React.FC = () => {
   const { userId } = useParams() // Use userId instead of id
   const { SocialContract, client, account } = useSocialTokenContext()
-
+  
   const [user, setUser] = useState<any>(null)
   const [imageUrl, setImageUrl] = useState<string>("")
   const [isVisible, setIsVisible] = useState(false)

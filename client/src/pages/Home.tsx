@@ -1,32 +1,41 @@
 import React, { useEffect, useState } from "react"
-import { Link, Navigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useActiveAccount } from "thirdweb/react"
 import { useSocialTokenContext } from "../context/context"
 import { readContract } from "thirdweb"
 
 const Home = () => {
-  const [registered, setRegistered] = useState(true)
+  const [registered, setRegistered] = useState<boolean | null>(null)
   const { SocialContract } = useSocialTokenContext()
-  const address = useActiveAccount()?.address
-  if (!registered) {
-    return <Navigate to="/login" />
-  }
+  const activeAccount = useActiveAccount()
+  const address = activeAccount?.address
+  const navigate = useNavigate() // Use useNavigate hook instead of Navigate component
+
   useEffect(() => {
-    if (address) {
-      const isUser = async () => {
+    const checkUserRegistration = async () => {
+      if (address) {
         const data = await readContract({
           contract: SocialContract,
           method: "function isAUser(address) view returns (bool)",
           params: [address],
         })
         setRegistered(data)
-        console.log(data)
       }
-      isUser()
     }
+    checkUserRegistration()
+  }, [SocialContract, address])
 
-    return () => {}
-  }, [SocialContract])
+  // Handle redirection after the hook has been executed
+  useEffect(() => {
+    if (registered === false) {
+      navigate("/login") // Navigate programmatically
+    }
+  }, [registered, navigate])
+
+  // Handle loading state
+  if (registered === null) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="h-screen text-primary">
@@ -45,10 +54,7 @@ const Home = () => {
             <Link to="/explore" className="button-p">
               Explore Posts
             </Link>
-            <Link
-              to={`/profile/${useActiveAccount()?.address}`}
-              className="button-p"
-            >
+            <Link to={`/profile/${address}`} className="button-p">
               Your Profile
             </Link>
             <Link to="/shop" className="button-p">
