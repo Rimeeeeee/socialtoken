@@ -5,6 +5,7 @@ import { prepareContractCall, readContract, sendTransaction } from "thirdweb"
 import { useSocialTokenContext } from "../context/context"
 import { download } from "thirdweb/storage"
 import { useNavigate } from "react-router-dom"
+import { createWallet } from "thirdweb/wallets"
 interface PostData {
   pid: bigint
   creator: string
@@ -34,7 +35,7 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
   const [userName, setUserName] = useState("")
   const [profilePic, setProfilePic] = useState("")
   const [amount, setAmount] = useState(0)
-  const { SocialContract, client, account, ICSContract } =
+  const { SocialContract, client,  ICSContract } =
     useSocialTokenContext()
   const navigate = useNavigate()
   useEffect(() => {
@@ -148,6 +149,9 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
 
   const handleLike = async () => {
     if (pid) {
+      const wallet = createWallet("io.metamask")
+      const account = await wallet.connect({ client })
+
       const transaction = await prepareContractCall({
         contract: SocialContract,
         method: "function giveLike(uint256 _pid)",
@@ -166,6 +170,9 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
     if (pid) {
+      const wallet = createWallet("io.metamask")
+      const account = await wallet.connect({ client })
+
       const transaction = await prepareContractCall({
         contract: SocialContract,
         method: "function share(uint256 _pid)",
@@ -181,6 +188,9 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
     const spender = import.meta.env.VITE_SOCIAL_CONTRACT_ADDRESS
     console.log(spender)
     if (spender) {
+      const wallet = createWallet("io.metamask")
+      const account = await wallet.connect({ client })
+
       const transaction = await prepareContractCall({
         contract: ICSContract,
         method:
@@ -196,6 +206,9 @@ const Post: React.FC<NumberProps> = ({ pid, name }) => {
   const handleGift = async () => {
     if (pid) {
       await approve()
+      const wallet = createWallet("io.metamask")
+      const account = await wallet.connect({ client })
+
       const transaction = await prepareContractCall({
         contract: SocialContract,
         method: "function sendMoneyToPostCreator(uint256 _p, uint256 _amount)",

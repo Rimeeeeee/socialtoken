@@ -6,6 +6,7 @@ import Vanta from "../components/Vanta1"
 import { prepareContractCall, sendTransaction } from "thirdweb"
 import { useSocialTokenContext } from "../context/context"
 import { upload } from "thirdweb/storage"
+import { createWallet } from "thirdweb/wallets"
 
 const CreatePost: React.FC = () => {
   const [file, setFile] = useState<File | null>(null)
@@ -14,7 +15,7 @@ const CreatePost: React.FC = () => {
   const [location, setLocation] = useState<string>("")
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const { SocialContract, account, client } = useSocialTokenContext()
+  const { SocialContract, client } = useSocialTokenContext()
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -62,6 +63,8 @@ const CreatePost: React.FC = () => {
 
         const imageHash = fileHash
         const videoHash = fileHash
+        const wallet = createWallet("io.metamask")
+        const account = await wallet.connect({ client })
 
         // Prepare and send the transaction to the smart contract
         const transaction = prepareContractCall({

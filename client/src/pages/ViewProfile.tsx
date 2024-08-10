@@ -9,11 +9,13 @@ import { useSocialTokenContext } from "../context/context"
 import { download } from "thirdweb/storage"
 import Balance from "../components/Balance"
 import { useActiveAccount } from "thirdweb/react"
+import { createWallet } from "thirdweb/wallets"
 
 const ViewProfile: React.FC = () => {
   const { userId } = useParams() // Use userId instead of id
-  const { SocialContract, client, account } = useSocialTokenContext()
+  const { SocialContract, client } = useSocialTokenContext()
   
+
   const [user, setUser] = useState<any>(null)
   const [imageUrl, setImageUrl] = useState<string>("")
   const [isVisible, setIsVisible] = useState(false)
@@ -167,7 +169,7 @@ const ViewProfile: React.FC = () => {
                   </Link>
                 </div>
                 <div>
-                  {account?.address === userId ? (
+                  {useActiveAccount()?.address === userId ? (
                     <Balance /> // Show Balance component if account matches userId
                   ) : (
                     <FollowButton userId={user.userid} /> // Show FollowButton otherwise

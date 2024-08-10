@@ -14,7 +14,7 @@ const CreateToken: React.FC = () => {
   })
   const [createTokenSuccess, setCreateTokenSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { account, ICSContract, MarketContract, client } =
+  const {  ICSContract, MarketContract, client } =
     useSocialTokenContext()
   const address = useActiveAccount()?.address
 
@@ -23,6 +23,8 @@ const CreateToken: React.FC = () => {
       if (!ICSContract?.address || !MarketContract?.address || !address) {
         throw new Error("Invalid contract or account address.")
       }
+      const wallet = createWallet("io.metamask")
+      const account = await wallet.connect({ client })
 
       const transaction = await prepareContractCall({
         contract: ICSContract,
@@ -50,6 +52,9 @@ const CreateToken: React.FC = () => {
       if (!MarketContract?.address || !address) {
         throw new Error("Invalid contract or account address.")
       }
+      const wallet = createWallet("io.metamask")
+      const account = await wallet.connect({ client })
+
       await approve(formState.tokenValue)
 
       const transaction = await prepareContractCall({

@@ -1,9 +1,13 @@
 import React, { MouseEventHandler } from "react"
 import { prepareContractCall, sendTransaction } from "thirdweb"
 import { useSocialTokenContext } from "../context/context"
+import { createWallet } from "thirdweb/wallets"
 const DailyLogin = () => {
-  const { SocialContract, account } = useSocialTokenContext()
+  const { SocialContract,client} = useSocialTokenContext()
   const checkIn = async () => {
+    const wallet = createWallet("io.metamask")
+    const account = await wallet.connect({ client })
+
     const transaction = await prepareContractCall({
       contract: SocialContract,
       method: "function dailyCheckinHandler()",

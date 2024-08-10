@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { prepareContractCall, readContract, sendTransaction } from "thirdweb";
 import { useSocialTokenContext } from "../context/context";
 import { useActiveAccount } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
 
 interface FollowButtonProps {
   userId: string;
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({ userId }) => {
-  const {account, SocialContract } = useSocialTokenContext();
+  const {SocialContract,client } = useSocialTokenContext();
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null);
   const { address } = useActiveAccount() || {}; // Ensure correct type
 
@@ -40,9 +41,12 @@ const FollowButton: React.FC<FollowButtonProps> = ({ userId }) => {
 
   const handleFollowClick = async () => {
     if (!SocialContract || !address) return;
-
+   
     try {
       const method = isFollowing ? "unfollow" : "follow";
+      const wallet = createWallet("io.metamask")
+      const account = await wallet.connect({ client })
+
       const transaction = await prepareContractCall({
         contract: SocialContract,
         method: `function ${method}(address _user)`,

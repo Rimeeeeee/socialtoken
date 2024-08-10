@@ -3,6 +3,7 @@ import { prepareContractCall, readContract, sendTransaction } from "thirdweb";
 import { useSocialTokenContext } from "../../context/context";
 import { download } from "thirdweb/storage";
 import { useActiveAccount } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
 
 interface NFTProps {
   creatorName: string;
@@ -25,7 +26,7 @@ const NFT: React.FC<NFTProps> = ({
 }) => {
   const [image, setImage] = useState("");
   const [profile, setProfile] = useState("");
-  const { MarketContract, ICSContract, account, client } =
+  const { MarketContract, ICSContract, client } =
     useSocialTokenContext();
   const activeAccountAddress = useActiveAccount()?.address;
 
@@ -61,6 +62,9 @@ const NFT: React.FC<NFTProps> = ({
   const approve = async (price: number) => {
     const spender = import.meta.env.VITE_CONTRACT_ADDRESS_3;
     if (spender) {
+      const wallet = createWallet("io.metamask")
+      const account = await wallet.connect({ client })
+
       const transaction = await prepareContractCall({
         contract: ICSContract,
         method:
@@ -78,6 +82,9 @@ const NFT: React.FC<NFTProps> = ({
   const buyNFTs = async (tokenId: number, price: number) => {
     try {
       await approve(price);
+      const wallet = createWallet("io.metamask")
+      const account = await wallet.connect({ client })
+
       const transaction = await prepareContractCall({
         contract: MarketContract,
         method: "function sellNFT(uint256 _tokenId, uint256 tokenValue)",
