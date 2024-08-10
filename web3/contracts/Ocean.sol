@@ -5,6 +5,9 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract ICSToken is ERC20, ERC20Burnable {
     address payable owner;
@@ -15,7 +18,7 @@ contract ICSToken is ERC20, ERC20Burnable {
     }
 
     function mint(address account, uint value) public {
-        _mint(account, value);
+        _mint(account, value * (10 ** decimals()));
     }
 
     function destroy() public onlyOwner {
@@ -35,8 +38,8 @@ contract Social {
     constructor(address ot) {
         icstoken = ICSToken(ot);
         owner = (msg.sender);
-        icstoken.mint(address(this), 300000);
-        icstoken.approve(address(this), 300000);
+        icstoken.mint(address(this), 30000000 * (10 ** icstoken.decimals()));
+        icstoken.approve(address(this), 300000 * (10 ** icstoken.decimals()));
         icstoken.allowance(msg.sender, address(this));
     }
 
@@ -125,7 +128,11 @@ contract Social {
         post.tags = _tags;
         userCheck[msg.sender].content.push(post);
         postArray.push(post);
-        icstoken.transferFrom(address(this), msg.sender, 2);
+        icstoken.transferFrom(
+            address(this),
+            msg.sender,
+            2 * (10 ** icstoken.decimals())
+        );
         userCheck[msg.sender].token = icstoken.balanceOf(msg.sender);
     }
 
@@ -135,7 +142,11 @@ contract Social {
 
     function sendInitial() internal {
         registerCount++;
-        icstoken.transferFrom(address(this), msg.sender, 5);
+        icstoken.transferFrom(
+            address(this),
+            msg.sender,
+            5 * (10 ** icstoken.decimals())
+        );
         userCheck[msg.sender].token = icstoken.balanceOf(msg.sender);
         gotInitial[msg.sender] = true;
     }
@@ -172,7 +183,11 @@ contract Social {
                     userCheck[msg.sender].dailylikestamp[0];
                 if (diff <= 24 hours) {
                     userCheck[msg.sender].dailylikes = 0;
-                    icstoken.transferFrom(address(this), msg.sender, 2);
+                    icstoken.transferFrom(
+                        address(this),
+                        msg.sender,
+                        2 * (10 ** icstoken.decimals())
+                    );
                     userCheck[msg.sender].token = icstoken.balanceOf(
                         msg.sender
                     );
@@ -192,7 +207,11 @@ contract Social {
                     ];
                 if (diff <= 24 hours && diff1 > 24 hours) {
                     userCheck[msg.sender].dailylikes = 0;
-                    icstoken.transferFrom(address(this), msg.sender, 2);
+                    icstoken.transferFrom(
+                        address(this),
+                        msg.sender,
+                        2 * (10 ** icstoken.decimals())
+                    );
                     userCheck[msg.sender].token = icstoken.balanceOf(
                         msg.sender
                     );
@@ -234,7 +253,11 @@ contract Social {
                     userCheck[msg.sender].dailysharestamp[0];
                 if (diff <= 24 hours) {
                     userCheck[msg.sender].dailyshares = 0;
-                    icstoken.transferFrom(address(this), msg.sender, 1);
+                    icstoken.transferFrom(
+                        address(this),
+                        msg.sender,
+                        1 * (10 ** icstoken.decimals())
+                    );
                     userCheck[msg.sender].token = icstoken.balanceOf(
                         msg.sender
                     );
@@ -254,7 +277,11 @@ contract Social {
                     ];
                 if (diff <= 24 hours && diff1 > 24 hours) {
                     userCheck[msg.sender].dailyshares = 0;
-                    icstoken.transferFrom(address(this), msg.sender, 2);
+                    icstoken.transferFrom(
+                        address(this),
+                        msg.sender,
+                        2 * (10 ** icstoken.decimals())
+                    );
                     userCheck[msg.sender].token = icstoken.balanceOf(
                         msg.sender
                     );
@@ -276,7 +303,11 @@ contract Social {
         require(isAUser[msg.sender] == true, "should be user");
         Post storage post = posts[_p];
         require(_amount <= icstoken.balanceOf(msg.sender), "not possible");
-        icstoken.transferFrom(msg.sender, post.creator, _amount);
+        icstoken.transferFrom(
+            msg.sender,
+            post.creator,
+            _amount * (10 ** icstoken.decimals())
+        );
         userCheck[msg.sender].token = icstoken.balanceOf(msg.sender);
         userCheck[post.creator].token = icstoken.balanceOf(post.creator);
     }
@@ -380,7 +411,11 @@ contract Social {
         if (user.dailycheckins.length == 0) {
             user.dailycheckin = 1;
             user.dailycheckins.push(block.timestamp);
-            icstoken.transferFrom(address(this), msg.sender, 5);
+            icstoken.transferFrom(
+                address(this),
+                msg.sender,
+                5 * (10 ** icstoken.decimals())
+            );
             userCheck[msg.sender].token = icstoken.balanceOf(msg.sender);
         } else if (user.dailycheckins.length > 0) {
             if (
@@ -390,9 +425,177 @@ contract Social {
             ) {
                 user.dailycheckin += 1;
                 user.dailycheckins.push(block.timestamp);
-                icstoken.transferFrom(address(this), msg.sender, 5);
+                icstoken.transferFrom(
+                    address(this),
+                    msg.sender,
+                    5 * (10 ** icstoken.decimals())
+                );
                 userCheck[msg.sender].token = icstoken.balanceOf(msg.sender);
             }
         }
+    }
+}
+error NotEqualToPlatformFee();
+error PlatformFeeTransferFailed();
+error TransferFailed();
+error NotEnoughTokens();
+
+contract NFTMarketplace is ERC721URIStorage {
+    ICSToken public icsToken;
+    address private immutable i_owner;
+    uint256 tokenId = 0;
+    uint256 totalItemsSold = 0;
+    uint256 platformFee = 30 * (10 ** 18);
+
+    struct NFT {
+        uint256 tokenId;
+        address payable owner;
+        address payable seller;
+        uint256 price;
+        bool currentlyListed;
+    }
+
+    NFT[] public allListedNFTs;
+    mapping(address => NFT[]) public NFTListedByAddress;
+    mapping(address => NFT[]) public NFTOwnedByAddress;
+    mapping(uint256 => NFT) public idToNFT;
+
+    // events
+    event TokenListedEvent(
+        uint256 indexed tokenId,
+        address owner,
+        address seller,
+        uint256 price,
+        bool currentlyListed
+    );
+
+    constructor(address ics) ERC721("SocialNFTMarket", "ICSNFT") {
+        icsToken = ICSToken(ics);
+        i_owner = payable(msg.sender);
+    }
+
+    function createToken(
+        string memory tokenURI,
+        uint256 price,
+        uint256 tokenValue
+    ) public {
+        if (tokenValue * (10 ** icsToken.decimals()) < platformFee)
+            revert NotEqualToPlatformFee();
+        // make approve in the frontend
+        if (!pay(i_owner, platformFee)) revert PlatformFeeTransferFailed();
+
+        tokenId++;
+        uint256 newTokenId = tokenId;
+
+        _safeMint(msg.sender, newTokenId);
+        _setTokenURI(newTokenId, tokenURI);
+
+        NFT memory newNFT = NFT(
+            newTokenId,
+            payable(address(this)),
+            payable(msg.sender),
+            price * (10 ** icsToken.decimals()),
+            true
+        );
+
+        idToNFT[newTokenId] = newNFT;
+        allListedNFTs.push(newNFT);
+        NFTListedByAddress[msg.sender].push(newNFT);
+        // NFTOwnedByAddress[address(this)].push(newNFT);
+
+        _transfer(msg.sender, address(this), newTokenId);
+
+        emit TokenListedEvent(
+            newTokenId,
+            address(this),
+            msg.sender,
+            price,
+            true
+        );
+    }
+
+    function changePlatformFee(uint256 fee) public onlyOwner {
+        platformFee = fee * (10 ** 18);
+    }
+
+    function getPlatformFee() public view returns (uint256) {
+        return platformFee;
+    }
+
+    function getNFTListedByAddress(
+        address a
+    ) public view returns (NFT[] memory) {
+        return NFTListedByAddress[a];
+    }
+
+    function getNFTOwnedByAddress(
+        address a
+    ) public view returns (NFT[] memory) {
+        return NFTOwnedByAddress[a];
+    }
+
+    function sellNFT(uint256 _tokenId, uint256 tokenValue) public payable {
+        uint256 price = idToNFT[_tokenId].price;
+        address seller = idToNFT[_tokenId].seller;
+        if (tokenValue * (10 ** icsToken.decimals()) != price)
+            revert NotEnoughTokens();
+
+        // pay and approve as needed with the frontend
+        bool success = pay(seller, tokenValue);
+        if (!success) revert TransferFailed();
+
+        // Actually transfer the token to the new owner
+        _transfer(address(this), msg.sender, _tokenId);
+
+        // approve the marketplace to sell NFTs on your behalf
+        approve(address(this), _tokenId);
+
+        idToNFT[_tokenId].currentlyListed = false;
+        idToNFT[_tokenId].seller = payable(msg.sender);
+
+        // Update the NFT mappings
+        removeNFTFromOwner(seller, _tokenId);
+        addNFTToOwner(msg.sender, idToNFT[_tokenId]);
+
+        totalItemsSold++;
+    }
+
+    // Internal functions to update the mappings
+    function addNFTToOwner(address owner, NFT memory nft) internal {
+        NFTOwnedByAddress[owner].push(nft);
+    }
+
+    function removeNFTFromOwner(address owner, uint256 _tokenId) internal {
+        NFT[] storage ownedNFTs = NFTOwnedByAddress[owner];
+        for (uint256 i = 0; i < ownedNFTs.length; i++) {
+            if (ownedNFTs[i].tokenId == _tokenId) {
+                ownedNFTs[i] = ownedNFTs[ownedNFTs.length - 1];
+                ownedNFTs.pop();
+                break;
+            }
+        }
+    }
+
+    // token payment but pay needs approval (msg.sender to address.this in the ICS itself) which will be done in the frontend
+    function pay(address a, uint256 b) internal returns (bool) {
+        icsToken.approve(address(this), b);
+        icsToken.transferFrom(msg.sender, a, b);
+        return true;
+    }
+
+    function payContract(uint256 b) internal {
+        icsToken.approve(address(this), b);
+        icsToken.transferFrom(msg.sender, address(this), b);
+    }
+
+    // same needs approval
+    function payFromContract(address a, uint256 b) internal {
+        icsToken.approve(address(this), b);
+        icsToken.transferFrom(address(this), a, b);
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == i_owner, "Only Owner can Access This");
+        _;
     }
 }

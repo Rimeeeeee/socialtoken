@@ -132,38 +132,48 @@ const ViewProfile: React.FC = () => {
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold ml-5 mt-8">
                 {user.name}
               </h1>
-              <p className="text-gray-400 ml-5 text-xs sm:text-md">
+              <p className="text-gray-400 ml-5 text-xs sm:text-md hidden lg:block">
                 @{user.userid}
+              </p>
+              <p className="text-gray-400 ml-5 text-xs sm:text-md block lg:hidden">
+                @{user.userid.slice(0, 4) + "..." + user.userid.slice(36, 40)}
               </p>
               <p className="text-gray-20 ml-5">{user.bio}</p>
             </div>
           </div>
           <div className="flex space-x-1 md:space-x-8 mt-4 items-center justify-center">
-            <div className="flex items-center space-x-1">
-              <AiOutlineUser className="text-lg" />
-              <Link to={`/followers/${user.userid}`}>
-                <span className="font-bold">{user.followers}</span>
-              </Link>
-              <Link to={`/followers/${user.userid}`}>
-                <span className="text-gray-600 cursor-pointer hover:none">
-                  Followers
-                </span>
-              </Link>
+            <div className="flex flex-col">
+              <div className="flex flex-row">
+                <div className="flex items-center space-x-1">
+                  <AiOutlineUser className="text-lg" />
+                  <Link to={`/followers/${user.userid}`}>
+                    <span className="font-bold">{user.followers}</span>
+                  </Link>
+                  <Link to={`/followers/${user.userid}`}>
+                    <span className="text-gray-600 cursor-pointer hover:none sm:text-md text-sm">
+                      Followers
+                    </span>
+                  </Link>
+                </div>
+
+                <div className="flex items-center space-x-1">
+                  <AiOutlineTeam className="text-lg" />
+                  <span className="font-bold">{user.following}</span>
+                  <Link to={`/following/${user.userid}`}>
+                    <span className="text-gray-600 sm:text-md text-sm cursor-pointer hover:none">
+                      Following
+                    </span>
+                  </Link>
+                </div>
+                <div>
+                  {account?.address === userId ? (
+                    <Balance /> // Show Balance component if account matches userId
+                  ) : (
+                    <FollowButton userId={user.userid} /> // Show FollowButton otherwise
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-1">
-              <AiOutlineTeam className="text-lg" />
-              <span className="font-bold">{user.following}</span>
-              <Link to={`/following/${user.userid}`}>
-                <span className="text-gray-600 cursor-pointer hover:none">
-                  Following
-                </span>
-              </Link>
-            </div>
-            {account?.address === userId ? (
-              <Balance /> // Show Balance component if account matches userId
-            ) : (
-              <FollowButton userId={user.userid} /> // Show FollowButton otherwise
-            )}
           </div>
         </div>
       )}
