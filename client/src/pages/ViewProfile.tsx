@@ -21,7 +21,7 @@ const ViewProfile: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null)
   const [posts, setPosts] = useState<any[]>([])
-
+  const acc=useActiveAccount()?.address;
   useEffect(() => {
     const getUser = async () => {
       if (userId && SocialContract) {
@@ -169,7 +169,7 @@ const ViewProfile: React.FC = () => {
                   </Link>
                 </div>
                 <div>
-                  {useActiveAccount()?.address === userId ? (
+                  { acc=== userId ? (
                     <Balance /> // Show Balance component if account matches userId
                   ) : (
                     <FollowButton userId={user.userid} /> // Show FollowButton otherwise
