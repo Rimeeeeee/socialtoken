@@ -19,3 +19,13 @@ A decentralized token-based social media platform revolutionizes the way users i
 - **Decentralization:** By removing central control, the platform reduces the risk of censorship and gives users more freedom to express themselves. It also ensures that the value generated within the platform is distributed fairly among the users rather than being concentrated in the hands of a few.
 
 Overall, this platform empowers users by giving them more control, better monetization options, and a more secure and integrated environment for their social interactions and digital transactions.
+Here are few previews of SocialT-
+![Screenshot (79)](https://github.com/user-attachments/assets/32564db7-3c2c-43b2-bc86-e4e9eb3c0ef6)
+![Screenshot (83)](https://github.com/user-attachments/assets/f8268511-63d0-47a1-9807-0a009aa8d0d9)
+![Screenshot 2024-08-10 204206](https://github.com/user-attachments/assets/b3ef701e-2c73-4110-97d8-372c2d72e1fb)
+![Screenshot (90)](https://github.com/user-attachments/assets/d7a38cb7-d986-4604-8ca3-19e5d51d5cc9)
+![Screenshot (95)](https://github.com/user-attachments/assets/18b6d514-1dcd-427f-b227-86d47d6802d7)
+
+
+
+
