@@ -51,19 +51,19 @@ export const SocialTokenContextProvider = ({
 }: socialTokenContextProviderProps) => {
   const ICSContract = getContract({
     client,
-    chain: defineChain(3441006),
+    chain: defineChain(Number(import.meta.env.VITE_CHAIN_ID)),
     address: import.meta.env.VITE_ICS_CONTRACT_ADDRESS as string,
   })
 
   const SocialContract = getContract({
     client,
-    chain: defineChain(3441006),
+    chain: defineChain(Number(import.meta.env.VITE_CHAIN_ID)),
     address: import.meta.env.VITE_SOCIAL_CONTRACT_ADDRESS as string,
   })
 
   const MarketContract = getContract({
     client,
-    chain: defineChain(3441006),
+    chain: defineChain(Number(import.meta.env.VITE_CHAIN_ID)),
     address: import.meta.env.VITE_CONTRACT_ADDRESS_3 as string,
   })
   
